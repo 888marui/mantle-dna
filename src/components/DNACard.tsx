@@ -59,8 +59,18 @@ export function DNACard({ analysis }: Props) {
     <div className="p-6 rounded-2xl bg-gray-900/60 border border-gray-800 space-y-5">
       {/* Archetype Header */}
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-800/50 flex items-center justify-center text-4xl">
-          {analysis.archetypeEmoji}
+        <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-800/50 flex-shrink-0 flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={analysis.archetypeImage}
+            alt={analysis.archetypeName}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const t = e.currentTarget;
+              t.style.display = "none";
+              t.parentElement!.innerHTML = `<span class="text-4xl">${analysis.archetypeEmoji}</span>`;
+            }}
+          />
         </div>
         <div>
           <div className="text-xs text-emerald-400 font-medium uppercase tracking-wider mb-1">

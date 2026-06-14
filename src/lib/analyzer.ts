@@ -15,6 +15,7 @@ export interface WalletTraits {
 export interface WalletAnalysis extends WalletTraits {
   archetypeName: string;
   archetypeEmoji: string;
+  archetypeImage: string;
   description: string;
   mntBalance: string;
   address: string;
@@ -28,35 +29,42 @@ const ARCHETYPES = [
   {
     name: "DeFi Degen",
     emoji: "🔥",
+    image: "/archetypes/defi-degen.png",
     description: "You live and breathe DeFi. High-frequency swaps, yield chasing, and protocol hopping define your on-chain DNA.",
   },
   {
     name: "Diamond Hands",
     emoji: "💎",
+    image: "/archetypes/diamond-hands.png",
     description: "You hold through the storms. Low churn, patient accumulation — your wallet is a testament to conviction.",
   },
   {
     name: "NFT Collector",
     emoji: "🎨",
+    image: "/archetypes/nft-collector.png",
     description: "Digital art and collectibles fuel your on-chain journey. Your wallet is a curated gallery.",
   },
   {
     name: "Yield Farmer",
     emoji: "🌾",
+    image: "/archetypes/yield-farmer.png",
     description: "Liquidity provision and passive yield are your game. You make your assets work for you 24/7.",
   },
   {
     name: "Newcomer",
     emoji: "🌱",
+    image: "/archetypes/newcomer.png",
     description: "Your on-chain journey is just beginning. Fresh wallet, big potential — the Mantle ecosystem awaits.",
   },
   {
     name: "Whale",
     emoji: "🐋",
+    image: "/archetypes/whale.png",
     description: "High-value transactions and strategic moves define your footprint. Every action you take moves markets.",
   },
   {
     name: "Trader",
+    image: "/archetypes/trader.png",
     emoji: "📊",
     description: "Active DEX user with sharp timing. You read the charts and execute with precision.",
   },
@@ -81,6 +89,7 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     ...traits,
     archetypeName: archetype.name,
     archetypeEmoji: archetype.emoji,
+    archetypeImage: archetype.image,
     description: archetype.description,
     mntBalance,
     address,
