@@ -3,6 +3,8 @@
 import { type WalletAnalysis } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
+
+const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
 import { keccak256, toBytes } from "viem";
 import { ShareButton } from "@/components/ShareButton";
 
@@ -147,6 +149,10 @@ export function DNACard({ analysis }: Props) {
       {isSuccess ? (
         <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-sm text-center">
           🎉 DNA NFT minted to your wallet!
+        </div>
+      ) : !CONTRACT_DEPLOYED ? (
+        <div className="p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-gray-500 text-xs text-center">
+          Soulbound NFT minting coming soon — contract deploying to Mantle Sepolia
         </div>
       ) : (
         <button
