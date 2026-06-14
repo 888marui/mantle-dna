@@ -1,10 +1,9 @@
 node_modules
 .env
-artifacts
-cache
-typechain-types
-coverage
-coverage.json
-frontend/.next
-frontend/node_modules
-frontend/.env.local
+.env.local
+.next
+blockchain/artifacts
+blockchain/cache
+blockchain/typechain-types
+blockchain/coverage
+blockchain/coverage.json
