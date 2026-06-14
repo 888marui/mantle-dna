@@ -2,8 +2,13 @@ node_modules
 .env
 .env.local
 .next
+frontend/.next
+frontend/node_modules
+next-env.d.ts
 blockchain/artifacts
 blockchain/cache
 blockchain/typechain-types
 blockchain/coverage
 blockchain/coverage.json
+package-lock.json
+frontend/package-lock.json
