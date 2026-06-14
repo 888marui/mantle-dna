@@ -1,7 +1,7 @@
 "use client";
 
-import { ConnectKitButton } from "connectkit";
 import { useAccount } from "wagmi";
+import { WalletButton } from "@/components/WalletButton";
 import { useState } from "react";
 import { analyzeWallet, type WalletAnalysis } from "@/lib/analyzer";
 import { DNACard } from "@/components/DNACard";
@@ -46,7 +46,7 @@ export default function Home() {
               </span>
             </div>
           </div>
-          <ConnectKitButton />
+          <WalletButton />
         </div>
       </header>
 

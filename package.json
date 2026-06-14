@@ -12,14 +12,9 @@
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "ethers": "^6.11.1",
     "wagmi": "^2.9.4",
-    "@wagmi/core": "^2.10.4",
-    "connectkit": "^1.8.2",
     "@tanstack/react-query": "^5.36.0",
-    "viem": "^2.13.3",
-    "lucide-react": "^0.379.0",
-    "clsx": "^2.1.1"
+    "viem": "^2.13.3"
   },
   "devDependencies": {
     "typescript": "^5",
