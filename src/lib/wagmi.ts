@@ -1,34 +1,8 @@
 import { createConfig, http } from "wagmi";
-import { defineChain } from "viem";
 import { getDefaultConfig } from "connectkit";
+import { mantleMainnet, mantleTestnet } from "./chains";
 
-export const mantleMainnet = defineChain({
-  id: 5000,
-  name: "Mantle",
-  nativeCurrency: { name: "Mantle", symbol: "MNT", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://rpc.mantle.xyz"] },
-  },
-  blockExplorers: {
-    default: { name: "Mantle Explorer", url: "https://explorer.mantle.xyz" },
-  },
-});
-
-export const mantleTestnet = defineChain({
-  id: 5003,
-  name: "Mantle Sepolia Testnet",
-  nativeCurrency: { name: "Mantle", symbol: "MNT", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://rpc.sepolia.mantle.xyz"] },
-  },
-  blockExplorers: {
-    default: {
-      name: "Mantle Sepolia Explorer",
-      url: "https://explorer.sepolia.mantle.xyz",
-    },
-  },
-  testnet: true,
-});
+export { mantleMainnet, mantleTestnet };
 
 export const config = createConfig(
   getDefaultConfig({
@@ -39,7 +13,7 @@ export const config = createConfig(
     },
     walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo",
     appName: "Mantle DNA",
-    appDescription: "Decentralized Genomic Data Ownership on Mantle Network",
+    appDescription: "AI-powered wallet DNA analysis on Mantle Network",
     appUrl: "https://mantle-dna.xyz",
   })
 );
