@@ -143,6 +143,31 @@ export function DNACard({ analysis }: Props) {
       {/* Description */}
       <p className="text-sm text-gray-400 leading-relaxed">{analysis.description}</p>
 
+      {/* Total DNA Score */}
+      {(() => {
+        const totalPct = Math.round(
+          ((analysis.deFiScore + analysis.holdScore + analysis.diversityScore + analysis.activityScore) / 40)
+        );
+        return (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-400 font-medium uppercase tracking-wider">DNA Strength</span>
+              <span className="font-bold text-sm" style={{ color: accentColor }}>{totalPct}%</span>
+            </div>
+            <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${totalPct}%`,
+                  background: `linear-gradient(90deg, ${accentColor}aa, ${accentColor})`,
+                  boxShadow: `0 0 8px ${accentColor}60`,
+                }}
+              />
+            </div>
+          </div>
+        );
+      })()}
+
       {/* AI Insights Section */}
       {analysis.aiInsight && (
         <div
@@ -199,6 +224,26 @@ export function DNACard({ analysis }: Props) {
           )}
         </div>
       )}
+
+      {/* Protocol Affinity */}
+      <div className="space-y-2">
+        <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Ecosystem Affinity</div>
+        <div className="flex flex-wrap gap-2">
+          {analysis.protocolAffinity.map((protocol) => (
+            <span
+              key={protocol}
+              className="px-2.5 py-1 rounded-lg text-xs font-medium"
+              style={{
+                background: `${accentColor}15`,
+                border: `1px solid ${accentColor}35`,
+                color: "#9ca3af",
+              }}
+            >
+              {protocol}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-3">

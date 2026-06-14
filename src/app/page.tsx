@@ -74,6 +74,13 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<RecentEntry[]>([]);
   const [statsMounted, setStatsMounted] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
+
+  const LOADING_STAGES = [
+    "Fetching on-chain data...",
+    "Computing DNA traits...",
+    "Running AI analysis...",
+  ];
 
   useEffect(() => {
     setRecentAnalyses(loadRecent());
@@ -81,6 +88,19 @@ export default function Home() {
     const t = setTimeout(() => setStatsMounted(true), 300);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStage(0);
+      return;
+    }
+    setLoadingStage(0);
+    const interval = setInterval(() => {
+      setLoadingStage((prev) => (prev + 1) % LOADING_STAGES.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const handleAnalyze = async (walletAddress: string) => {
     setLoading(true);
@@ -187,7 +207,19 @@ export default function Home() {
         {loading && (
           <div className="flex flex-col items-center gap-4 py-12">
             <div className="text-5xl animate-spin">🧬</div>
-            <p className="text-gray-400">Sequencing on-chain DNA...</p>
+            <p className="text-emerald-400 font-medium">{LOADING_STAGES[loadingStage]}</p>
+            <div className="flex gap-2">
+              {LOADING_STAGES.map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: i === loadingStage ? "24px" : "8px",
+                    background: i === loadingStage ? "#10b981" : "#374151",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )}
 
