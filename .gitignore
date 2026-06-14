@@ -9,3 +9,4 @@ blockchain/typechain-types
 blockchain/coverage
 blockchain/coverage.json
 package-lock.json
+*.tsbuildinfo
