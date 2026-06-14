@@ -18,6 +18,10 @@ export interface WalletAnalysis extends WalletTraits {
   description: string;
   mntBalance: string;
   address: string;
+  aiInsight?: string;
+  aiStrengths?: string[];
+  aiWatchOut?: string;
+  aiPrediction?: string;
 }
 
 const ARCHETYPES = [
@@ -73,7 +77,7 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
   const traits = computeTraitsFromAddress(address, latestBlock, balance);
   const archetype = ARCHETYPES[traits.archetype];
 
-  return {
+  const analysis: WalletAnalysis = {
     ...traits,
     archetypeName: archetype.name,
     archetypeEmoji: archetype.emoji,
@@ -81,6 +85,41 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     mntBalance,
     address,
   };
+
+  // Call the AI endpoint to get insights
+  try {
+    const baseUrl =
+      typeof window !== "undefined"
+        ? ""
+        : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const response = await fetch(`${baseUrl}/api/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address,
+        balance: mntBalance,
+        txCount: traits.txCount,
+        deFiScore: traits.deFiScore,
+        holdScore: traits.holdScore,
+        diversityScore: traits.diversityScore,
+        activityScore: traits.activityScore,
+        archetype: archetype.name,
+      }),
+    });
+
+    if (response.ok) {
+      const aiData = await response.json();
+      if (aiData.insight) analysis.aiInsight = aiData.insight;
+      if (aiData.strengths) analysis.aiStrengths = aiData.strengths;
+      if (aiData.watchOut) analysis.aiWatchOut = aiData.watchOut;
+      if (aiData.prediction) analysis.aiPrediction = aiData.prediction;
+    }
+  } catch {
+    // AI enrichment failed — continue without it
+  }
+
+  return analysis;
 }
 
 function computeTraitsFromAddress(

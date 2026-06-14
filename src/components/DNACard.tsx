@@ -3,6 +3,8 @@
 import { type WalletAnalysis } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
+import { keccak256, toBytes } from "viem";
+import { ShareButton } from "@/components/ShareButton";
 
 interface Props {
   analysis: WalletAnalysis;
@@ -28,6 +30,9 @@ export function DNACard({ analysis }: Props) {
   ];
 
   const handleMint = () => {
+    const insightText = analysis.aiInsight || analysis.description;
+    const aiInsightHash = keccak256(toBytes(insightText));
+
     writeContract({
       address: WALLET_DNA_ADDRESS,
       abi: WALLET_DNA_ABI,
@@ -44,6 +49,7 @@ export function DNACard({ analysis }: Props) {
           activityScore: analysis.activityScore,
           firstSeenBlock: analysis.firstSeenBlock,
           analyzedAt: analysis.analyzedAt,
+          aiInsightHash,
         },
       ],
     });
@@ -70,6 +76,47 @@ export function DNACard({ analysis }: Props) {
       {/* Description */}
       <p className="text-sm text-gray-400 leading-relaxed">{analysis.description}</p>
 
+      {/* AI Insights Section */}
+      {analysis.aiInsight && (
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/40 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">✨</span>
+            <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">AI Analysis</span>
+          </div>
+          <p className="text-sm text-gray-300 leading-relaxed">{analysis.aiInsight}</p>
+
+          {analysis.aiStrengths && analysis.aiStrengths.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-xs text-gray-500 uppercase tracking-wider">Strengths</div>
+              <div className="flex flex-wrap gap-2">
+                {analysis.aiStrengths.map((s) => (
+                  <span
+                    key={s}
+                    className="px-2 py-0.5 rounded-full bg-emerald-900/50 border border-emerald-700/50 text-xs text-emerald-300"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {analysis.aiWatchOut && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-500 uppercase tracking-wider">Watch Out</div>
+              <p className="text-xs text-yellow-400/80 leading-relaxed">⚠️ {analysis.aiWatchOut}</p>
+            </div>
+          )}
+
+          {analysis.aiPrediction && (
+            <div className="space-y-1">
+              <div className="text-xs text-gray-500 uppercase tracking-wider">Prediction</div>
+              <p className="text-xs text-blue-400/80 leading-relaxed">🔮 {analysis.aiPrediction}</p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-3">
         <StatBadge label="Transactions" value={analysis.txCount.toString()} />
@@ -82,6 +129,9 @@ export function DNACard({ analysis }: Props) {
           <ScoreBar key={key} label={SCORE_LABELS[key]} value={value} />
         ))}
       </div>
+
+      {/* Share Button */}
+      <ShareButton analysis={analysis} />
 
       {/* Mint Button */}
       {isSuccess ? (

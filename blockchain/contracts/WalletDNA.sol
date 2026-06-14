@@ -29,6 +29,7 @@ contract WalletDNA is ERC721, ERC721URIStorage, Ownable {
         uint16 activityScore;     // 0-1000: Recent activity
         uint32 firstSeenBlock;    // First transaction block
         uint32 analyzedAt;        // Unix timestamp of analysis
+        bytes32 aiInsightHash;    // keccak256 of the AI insight text
     }
 
     mapping(uint256 => DNATraits) public dnaTraits;
