@@ -6,14 +6,32 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mantle DNA - Decentralized Genomic Data Platform",
+  title: "Mantle DNA — Discover Your On-Chain Identity",
   description:
-    "Own your genetic data. Share it on your terms. Earn rewards for contributing to science. Built on Mantle Network.",
+    "AI-powered wallet personality analysis on Mantle Network. Discover your on-chain DNA and mint it as a Soulbound NFT.",
+  metadataBase: new URL("https://mantle-dna.vercel.app"),
   openGraph: {
-    title: "Mantle DNA",
-    description: "Decentralized Genomic Data Ownership on Mantle Network",
-    images: ["/og-image.png"],
+    title: "Mantle DNA — Discover Your On-Chain Identity",
+    description:
+      "AI-powered wallet personality analysis. 7 archetypes. Soulbound NFT.",
+    type: "website",
+    siteName: "Mantle DNA",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mantle DNA",
+    description: "Discover your on-chain DNA on Mantle Network",
+  },
+  keywords: [
+    "Mantle",
+    "Web3",
+    "NFT",
+    "DeFi",
+    "wallet",
+    "AI",
+    "Soulbound",
+    "DNA",
+  ],
 };
 
 export default function RootLayout({

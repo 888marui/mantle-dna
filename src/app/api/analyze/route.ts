@@ -23,23 +23,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing address" }, { status: 400 });
     }
 
-    const prompt = `You are a Web3 personality analyst. Based on this Mantle wallet's on-chain data:
+    const prompt = `You are a witty on-chain DNA analyst for Mantle Network. Analyze this wallet's on-chain genome:
 
-Address: ${address}
-Balance: ${balance} MNT
+Wallet: ${address}
+Archetype: ${archetype} (their dominant on-chain personality)
+MNT Balance: ${balance} MNT
 Transaction Count: ${txCount}
-DeFi Score: ${deFiScore}/1000
-HODL Score: ${holdScore}/1000
-Diversity Score: ${diversityScore}/1000
-Activity Score: ${activityScore}/1000
-Archetype: ${archetype}
 
-Write a short DNA analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
+DNA Scores (0-1000):
+- DeFi Score: ${deFiScore}/1000 — ${deFiScore > 700 ? "heavy protocol user" : deFiScore > 400 ? "moderate DeFi participant" : "minimal DeFi activity"}
+- HODL Score: ${holdScore}/1000 — ${holdScore > 700 ? "diamond hands" : holdScore > 400 ? "balanced trader" : "active seller"}
+- Diversity Score: ${diversityScore}/1000 — ${diversityScore > 700 ? "multi-protocol explorer" : diversityScore > 400 ? "selectively diverse" : "focused on few protocols"}
+- Activity Score: ${activityScore}/1000 — ${activityScore > 700 ? "highly active on-chain" : activityScore > 400 ? "regularly active" : "occasional user"}
+
+Archetype context:
+- "DeFi Degen": loves risky, high-yield plays; chases APY across protocols; likely yield farming
+- "Diamond Hand HODLer": accumulates and rarely sells; long-term conviction; stacks MNT
+- "Protocol Explorer": tries every new protocol; early adopter; breadth over depth
+- "Yield Farmer": optimizes for sustainable yield; liquidity provider; compounding rewards
+- "NFT Collector": bridges between NFT and DeFi worlds; values digital ownership
+- "Whale": large positions; market-moving potential; measured moves
+- "Newcomer": early in their Web3 journey; building habits; learning the ecosystem
+
+Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values in your analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
 {
-  "insight": "2 sentences about their Web3 personality based on the data",
-  "strengths": ["trait 1", "trait 2", "trait 3"],
-  "watchOut": "one specific risk to watch for this wallet type",
-  "prediction": "one sentence about their DeFi future on Mantle"
+  "insight": "2 punchy sentences that capture their Web3 personality based on their specific scores. Reference actual numbers. Be insightful and a bit cheeky.",
+  "strengths": ["3 specific on-chain skills this wallet excels at based on their score pattern — e.g. 'Liquidity timing', 'Protocol risk assessment', 'MNT accumulation discipline'"],
+  "watchOut": "One specific DeFi risk they face given their archetype and score pattern on Mantle — be concrete, not generic",
+  "prediction": "One bold prediction about their next move in the Mantle ecosystem. Mention specific protocols like Agni Finance, Merchant Moe, Lendle, mETH Protocol, or Init Capital where relevant."
 }`;
 
     const message = await client.messages.create({
