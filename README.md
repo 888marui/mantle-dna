@@ -1,159 +1,102 @@
 # 🧬 Mantle DNA
 
-**Decentralized Genomic Data Ownership Platform on Mantle Network**
+**AI-powered wallet DNA analysis on Mantle Network**
 
-## Overview
+> Enter any Mantle wallet address → get an instant on-chain personality profile → mint it as a Soulbound NFT
 
-Mantle DNA is a decentralized platform that enables individuals to store, manage, and selectively share their genomic data on the Mantle blockchain. By leveraging Mantle's low-cost L2 infrastructure, we make on-chain genomic data management accessible and affordable for everyone.
+## What is Mantle DNA?
 
-## Problem
+Every wallet on Mantle has a unique on-chain fingerprint — a pattern of transactions, DeFi interactions, holdings, and behaviors that define its identity. Mantle DNA reveals that fingerprint.
 
-- Genetic data is stored in centralized databases controlled by corporations
-- Users have no true ownership or control over their most personal data
-- Sharing genomic data for research requires trusting intermediaries
-- High gas fees on L1 make on-chain genomic data impractical
+We analyze wallet history across Mantle and distill it into a **DNA Profile**: a visual genome map with 4 trait scores and 1 of 7 personality archetypes, permanently recorded as a non-transferable (Soulbound) NFT.
 
-## Solution
+## Archetypes
 
-Mantle DNA provides:
-
-1. **Self-Sovereign Identity**: Your DNA profile is an NFT you truly own
-2. **Privacy-Preserving Sharing**: Share encrypted data hashes, not raw sequences
-3. **Consent Management**: Grant/revoke access to researchers on-chain
-4. **Incentivized Research**: Earn tokens when your anonymized data contributes to approved research
-5. **Low Cost**: Mantle's L2 makes transactions 10-100x cheaper than Ethereum L1
+| Archetype | Emoji | Traits |
+|---|---|---|
+| DeFi Degen | 🔥 | High-frequency DeFi, protocol hopping |
+| Diamond Hands | 💎 | Long-term holder, low churn |
+| NFT Collector | 🎨 | Active NFT buying/selling |
+| Yield Farmer | 🌾 | Liquidity provision, passive yield |
+| Newcomer | 🌱 | Recent wallet, building history |
+| Whale | 🐋 | High-value strategic transactions |
+| Trader | 📊 | Active DEX user, timing-focused |
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                │
-│          MetaMask / Mantle Wallet Integration        │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│              Smart Contracts (Mantle)                │
-│  ┌─────────────────┐  ┌──────────────────────────┐  │
-│  │  DNAProfile.sol │  │  ConsentManager.sol       │  │
-│  │  (ERC-721 NFT)  │  │  (Access Control)         │  │
-│  └─────────────────┘  └──────────────────────────┘  │
-│  ┌────────────────────────────────────────────────┐  │
-│  │         DNAToken.sol (ERC-20 Rewards)          │  │
-│  └────────────────────────────────────────────────┘  │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│              Off-chain Storage (IPFS)                │
-│         Encrypted genomic data stored off-chain      │
-│         Only hashes stored on Mantle blockchain      │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│            Frontend (Next.js 14)              │
+│  SearchBar → WalletAnalysis → DNAVisualizer   │
+│  Mint Soulbound NFT via ConnectKit/wagmi      │
+└──────────────────┬───────────────────────────┘
+                   │
+┌──────────────────▼───────────────────────────┐
+│          Analyzer (Next.js + viem)            │
+│  Fetch balance + block data from Mantle RPC   │
+│  Derive DNA traits from on-chain activity     │
+└──────────────────┬───────────────────────────┘
+                   │
+┌──────────────────▼───────────────────────────┐
+│         WalletDNA.sol (Mantle Network)        │
+│  ERC-721 Soulbound NFT — stores DNA traits   │
+│  7 archetypes, 4 trait scores, tx metadata   │
+└──────────────────────────────────────────────┘
 ```
 
 ## Tech Stack
 
-- **Blockchain**: Mantle Network (L2)
-- **Smart Contracts**: Solidity + Hardhat
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Web3**: ethers.js, wagmi, ConnectKit
-- **Storage**: IPFS (via Pinata)
-- **Testing**: Hardhat + Chai
+- **Blockchain**: Mantle Network (L2 on Ethereum)
+- **Smart Contract**: Solidity + Hardhat — ERC-721 Soulbound NFT
+- **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
+- **Web3**: wagmi v2 + ConnectKit + viem
+- **Analysis**: On-chain data via Mantle RPC
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18+
-- npm or yarn
-- MetaMask with Mantle Network configured
+- MetaMask configured for Mantle Network
 
-### Installation
+### Contracts
 
 ```bash
-git clone https://github.com/888marui/mantle-dna.git
-cd mantle-dna
 npm install
-```
-
-### Configure Environment
-
-```bash
-cp .env.example .env
-# Fill in your values:
-# PRIVATE_KEY=your_wallet_private_key
-# MANTLE_RPC_URL=https://rpc.mantle.xyz
-# PINATA_API_KEY=your_pinata_key
-# PINATA_SECRET_KEY=your_pinata_secret
-```
-
-### Deploy Contracts
-
-```bash
-# Deploy to Mantle Testnet (Sepolia)
+cp .env.example .env  # add PRIVATE_KEY
 npm run deploy:testnet
-
-# Deploy to Mantle Mainnet
-npm run deploy:mainnet
 ```
 
-### Run Frontend
+### Frontend
 
 ```bash
 cd frontend
 npm install
+cp ../.env.example .env.local  # add contract addresses
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Visit [http://localhost:3000](http://localhost:3000)
 
-## Smart Contracts
-
-| Contract | Description | Address (Testnet) |
-|----------|-------------|-------------------|
-| DNAProfile | NFT representing a user's DNA profile | `0x...` |
-| ConsentManager | Manages data sharing permissions | `0x...` |
-| DNAToken | ERC-20 reward token for data contributors | `0x...` |
-
-## Mantle Network Configuration
+## Mantle Network Config
 
 ```
-Network Name: Mantle Mainnet
-RPC URL: https://rpc.mantle.xyz
-Chain ID: 5000
-Currency Symbol: MNT
-Block Explorer: https://explorer.mantle.xyz
+Testnet: Mantle Sepolia
+RPC:     https://rpc.sepolia.mantle.xyz
+ChainID: 5003
+Explorer: https://explorer.sepolia.mantle.xyz
+
+Mainnet: Mantle
+RPC:     https://rpc.mantle.xyz
+ChainID: 5000
+Explorer: https://explorer.mantle.xyz
 ```
-
-```
-Network Name: Mantle Sepolia Testnet
-RPC URL: https://rpc.sepolia.mantle.xyz
-Chain ID: 5003
-Currency Symbol: MNT
-Block Explorer: https://explorer.sepolia.mantle.xyz
-```
-
-## How It Works
-
-1. **Upload**: User uploads their DNA data file (from 23andMe, AncestryDNA, etc.)
-2. **Encrypt**: Data is encrypted client-side with user's private key
-3. **Store**: Encrypted data is stored on IPFS, hash is stored on Mantle
-4. **Mint**: A DNAProfile NFT is minted to the user's wallet
-5. **Share**: User can grant/revoke access to specific researchers or institutions
-6. **Earn**: When anonymized data is used in approved research, user earns DNAToken rewards
-
-## Use Cases
-
-- **Genetic Research**: Opt-in participation in academic studies
-- **Personal Health**: Securely share genetic risks with healthcare providers
-- **Ancestry**: Collaborative family tree building without data loss
-- **Insurance**: Prove genetic conditions without revealing full profile
 
 ## Why Mantle?
 
-- **Low Gas Fees**: DNA data operations cost cents, not dollars
-- **EVM Compatible**: Full Solidity support, easy migration from Ethereum
-- **Fast Finality**: Near-instant transaction confirmation
-- **Data Availability**: Mantle DA ensures data is always accessible
-- **Growing Ecosystem**: Active DeFi and NFT community
+- **Low gas**: Minting a DNA NFT costs fractions of a cent
+- **EVM compatible**: Full Solidity + ethers.js support
+- **Fast finality**: Sub-second transaction confirmation
+- **Growing ecosystem**: Rich on-chain data to analyze
 
 ## Team
 
