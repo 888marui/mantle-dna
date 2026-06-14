@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     "Soulbound",
     "DNA",
   ],
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -23,6 +23,7 @@ export interface WalletAnalysis extends WalletTraits {
   aiStrengths?: string[];
   aiWatchOut?: string;
   aiPrediction?: string;
+  protocolAffinity: string[];  // Mantle protocols this wallet would likely use
 }
 
 const ARCHETYPES = [
@@ -70,6 +71,33 @@ const ARCHETYPES = [
   },
 ];
 
+const PROTOCOL_MAP: Record<number, string[]> = {
+  0: ["Agni Finance", "Merchant Moe", "Init Capital"],    // DeFi Degen
+  1: ["mETH Protocol", "Lendle", "FBTC"],                 // Diamond Hands
+  2: ["Mantle NFT Market", "Init Capital", "Agni Finance"], // NFT Collector
+  3: ["Agni Finance", "Lendle", "mETH Protocol"],          // Yield Farmer
+  4: ["Agni Finance", "Mantle Bridge", "mETH Protocol"],   // Newcomer
+  5: ["Lendle", "Init Capital", "mETH Protocol"],          // Whale
+  6: ["Merchant Moe", "Agni Finance", "Init Capital"],     // Trader
+};
+
+function computeProtocolAffinity(
+  archetype: number,
+  _deFiScore: number,
+  _holdScore: number,
+  diversityScore: number
+): string[] {
+  const protocols = [...(PROTOCOL_MAP[archetype] ?? PROTOCOL_MAP[4])];
+
+  if (diversityScore > 600) {
+    const extras = ["Mantle Bridge", "mETH Protocol", "FBTC", "Lendle", "Init Capital", "Merchant Moe"];
+    const extra = extras.find((p) => !protocols.includes(p));
+    if (extra) protocols.push(extra);
+  }
+
+  return protocols;
+}
+
 const MANTLE_RPC = process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz";
 
 export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
@@ -93,6 +121,7 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     description: archetype.description,
     mntBalance,
     address,
+    protocolAffinity: computeProtocolAffinity(traits.archetype, traits.deFiScore, traits.holdScore, traits.diversityScore),
   };
 
   // Call the AI endpoint to get insights
