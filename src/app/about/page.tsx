@@ -209,7 +209,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">✅ Product Complete (20%)</div>
-              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Compare wallets via /compare · Auto-analyze on paste/connect · Dual-network support · Public REST API (/api/wallet, /api/compare)</div>
+              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → download certificate → mint SBT · Compare wallets via /compare with X + Farcaster sharing · Auto-analyze on paste/connect · Dual-network · Shareable URLs · robots.txt + sitemap.xml</div>
             </div>
           </div>
         </div>

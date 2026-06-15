@@ -476,16 +476,28 @@ export default function ComparePage() {
             </button>
             {analysisA && analysisB && (() => {
               const compat = getCompatScore(analysisA.archetype, analysisB.archetype);
-              const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${window.location.origin}/compare?a=${addrA}&b=${addrB}\n#MantleDNA #Mantle`;
+              const compareUrl = `${window.location.origin}/compare?a=${addrA}&b=${addrB}`;
+              const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${compareUrl}\n#MantleDNA #Mantle`;
               return (
-                <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-black hover:bg-gray-900 border border-gray-700 text-white transition-colors"
-                >
-                  Share on 𝕏
-                </a>
+                <>
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-black hover:bg-gray-900 border border-gray-700 text-white transition-colors"
+                  >
+                    Share on 𝕏
+                  </a>
+                  <a
+                    href={`https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(compareUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg text-white transition-colors hover:opacity-80"
+                    style={{ background: "#7c3aed", border: "1px solid #6d28d9" }}
+                  >
+                    ⬡ Farcaster
+                  </a>
+                </>
               );
             })()}
           </div>
