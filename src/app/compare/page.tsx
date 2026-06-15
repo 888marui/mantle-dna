@@ -300,16 +300,33 @@ export default function ComparePage() {
     finally { setLoadingB(false); }
   }, [addrB, networkB]);
 
-  // Seed example wallets from URL params
+  // Auto-analyze from URL params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const a = params.get("a");
     const b = params.get("b");
-    if (a && isAddress(a)) setAddrA(a);
-    if (b && isAddress(b)) setAddrB(b);
-  }, []);
+    const net = (params.get("network") ?? "mainnet") as NetworkType;
 
-  const bothReady = analysisA && analysisB;
+    if (a && isAddress(a)) {
+      setAddrA(a);
+      setNetworkA(net);
+      setLoadingA(true);
+      analyzeWallet(a, net)
+        .then(setAnalysisA)
+        .catch(() => setErrorA("Failed to analyze wallet A"))
+        .finally(() => setLoadingA(false));
+    }
+    if (b && isAddress(b)) {
+      setAddrB(b);
+      setNetworkB(net);
+      setLoadingB(true);
+      analyzeWallet(b, net)
+        .then(setAnalysisB)
+        .catch(() => setErrorB("Failed to analyze wallet B"))
+        .finally(() => setLoadingB(false));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
@@ -397,7 +414,7 @@ export default function ComparePage() {
         )}
 
         {/* Results */}
-        {(loadingA || loadingB || bothReady) && (
+        {(loadingA || loadingB || !!(analysisA || analysisB)) && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Wallet A */}
             <div>
@@ -415,7 +432,7 @@ export default function ComparePage() {
 
             {/* Comparison panel */}
             <div>
-              {bothReady ? (
+              {analysisA && analysisB ? (
                 <ComparisonPanel a={analysisA} b={analysisB} />
               ) : (
                 <div className="flex items-center justify-center h-full min-h-48">
@@ -443,7 +460,7 @@ export default function ComparePage() {
         )}
 
         {/* Share comparison link */}
-        {bothReady && (
+        {analysisA && analysisB && (
           <div className="text-center">
             <button
               onClick={() => {
