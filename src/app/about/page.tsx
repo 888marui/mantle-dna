@@ -15,9 +15,14 @@ export default function AboutPage() {
             <span className="text-2xl">🧬</span>
             <span className="text-xl font-bold text-white tracking-tight">Mantle DNA</span>
           </Link>
-          <Link href="/" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-            ← Try it
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/compare" className="text-sm text-gray-400 hover:text-emerald-400 transition-colors">
+              Compare
+            </Link>
+            <Link href="/" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+              ← Try it
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -181,7 +186,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
-              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing</div>
+              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing · DNA Comparison with compatibility score + DNA distance metric</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">🔗 Mantle Ecosystem (25%)</div>
@@ -189,7 +194,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">✅ Product Complete (20%)</div>
-              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Auto-analyze on paste/connect · Dual-network support</div>
+              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Compare wallets via /compare · Auto-analyze on paste/connect · Dual-network support · Public REST API (/api/wallet, /api/compare)</div>
             </div>
           </div>
         </div>

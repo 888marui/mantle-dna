@@ -380,7 +380,7 @@ export default function ComparePage() {
         </div>
 
         {/* Quick example pairs */}
-        {!bothReady && (
+        {!(analysisA && analysisB) && (
           <div className="text-center space-y-2">
             <div className="text-xs text-gray-600 uppercase tracking-wider">Try example pairs</div>
             <div className="flex flex-wrap justify-center gap-2">
