@@ -160,7 +160,12 @@ function MiniCard({ analysis }: { analysis: WalletAnalysis }) {
 
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-500">Mantle Score</span>
-        <span className="font-bold" style={{ color }}>{analysis.mantleScore}/100</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px]">
+            {analysis.mantleScore >= 80 ? "💜" : analysis.mantleScore >= 60 ? "🏆" : analysis.mantleScore >= 30 ? "🥈" : "🥉"}
+          </span>
+          <span className="font-bold" style={{ color }}>{analysis.mantleScore}/100</span>
+        </div>
       </div>
 
       {analysis.aiInsight && (
