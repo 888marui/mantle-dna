@@ -192,40 +192,53 @@ export default function WalletPage({ params }: { params: { address: string } }) 
             </div>
 
             {/* Share row */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🧬 My Mantle DNA: ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore} | HODL: ${analysis.holdScore} | Activity: ${analysis.activityScore}\n\n${analysis.aiInsight || analysis.description}\n\nDiscover yours 👇\nmantle-dna.xyz\n#MantleDNA #Mantle #Web3`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-medium border border-gray-700 transition-colors"
-              >
-                Share on 𝕏
-              </a>
-              <a
-                href={`/api/og?${new URLSearchParams({
-                  address,
-                  archetype: String(analysis.archetype),
-                  defi: String(analysis.deFiScore),
-                  hodl: String(analysis.holdScore),
-                  diversity: String(analysis.diversityScore),
-                  activity: String(analysis.activityScore),
-                  network: analysis.network,
-                  mantleScore: String(analysis.mantleScore),
-                }).toString()}`}
-                download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
-              >
-                ↓ Certificate
-              </a>
-              <Link
-                href="/"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
-              >
-                🧬 Analyze your wallet
-              </Link>
-            </div>
+            {(() => {
+              const shareText = `🧬 My Mantle DNA: ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100\n\n${analysis.aiInsight || analysis.description}\n\nDiscover yours 👇\nhttps://mantle-dna.xyz/wallet/${address}?network=${analysis.network}\n#MantleDNA #Mantle #Web3`;
+              const walletShareUrl = `https://mantle-dna.xyz/wallet/${address}?network=${analysis.network}`;
+              return (
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-medium border border-gray-700 transition-colors"
+                  >
+                    Share on 𝕏
+                  </a>
+                  <a
+                    href={`https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(walletShareUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium transition-colors hover:opacity-80"
+                    style={{ background: "#7c3aed", border: "1px solid #6d28d9" }}
+                  >
+                    ⬡ Farcaster
+                  </a>
+                  <a
+                    href={`/api/og?${new URLSearchParams({
+                      address,
+                      archetype: String(analysis.archetype),
+                      defi: String(analysis.deFiScore),
+                      hodl: String(analysis.holdScore),
+                      diversity: String(analysis.diversityScore),
+                      activity: String(analysis.activityScore),
+                      network: analysis.network,
+                      mantleScore: String(analysis.mantleScore),
+                    }).toString()}`}
+                    download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
+                  >
+                    ↓ Certificate
+                  </a>
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
+                  >
+                    🧬 Analyze your wallet
+                  </Link>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>

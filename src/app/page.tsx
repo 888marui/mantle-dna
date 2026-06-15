@@ -55,7 +55,7 @@ const FEATURED_WALLETS: Array<{ address: string; archetype: string; emoji: strin
 
 const STATS = [
   { label: "Archetypes", value: "7 Types" },
-  { label: "Network", value: "Mantle" },
+  { label: "Tokens Tracked", value: "4 Live" },
   { label: "Analysis", value: "AI-Powered" },
   { label: "Identity", value: "Soulbound" },
 ];
@@ -224,8 +224,8 @@ export default function Home() {
             </span>
           </h1>
           <p className="relative text-gray-400 text-lg max-w-xl mx-auto">
-            Enter any Mantle wallet address to instantly reveal its unique on-chain personality
-            profile — powered by AI analysis and minted as a Soulbound NFT.
+            Enter any Mantle wallet address to reveal its on-chain personality — live token balances,
+            AI-generated profile, Mantle Ecosystem Score, and a DNA Evolution Path. Mint it as a Soulbound NFT.
           </p>
 
           {/* Stats Bar — pulse on mount */}
@@ -545,7 +545,9 @@ const features = [
   "🔗 Mantle Network",
   "🧬 7 Archetypes",
   "🎭 Soulbound NFT",
-  "⚡ Instant Analysis",
+  "⚡ Real ERC-20 Data",
   "🔒 Non-Transferable",
-  "📊 On-chain Scores",
+  "📊 Mantle Ecosystem Score",
+  "⬡ Share on Farcaster",
+  "🧬 DNA Evolution Path",
 ];
