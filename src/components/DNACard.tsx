@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { type WalletAnalysis, getExplorerUrl } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
@@ -54,6 +55,7 @@ const ARCHETYPE_RARITY: Record<number, string> = {
 };
 
 export function DNACard({ analysis }: Props) {
+  const [addrCopied, setAddrCopied] = useState(false);
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
@@ -177,8 +179,21 @@ export function DNACard({ analysis }: Props) {
               {analysis.network === 'mainnet' ? '🟢 Mainnet' : '🔵 Sepolia'}
             </span>
           </div>
-          <div className="text-xs text-gray-500 font-mono mt-1">
-            {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-xs text-gray-500 font-mono">
+              {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(analysis.address).catch(() => {});
+                setAddrCopied(true);
+                setTimeout(() => setAddrCopied(false), 1500);
+              }}
+              className="text-[10px] px-1 py-0.5 rounded text-gray-600 hover:text-gray-400 transition-colors"
+              title="Copy address"
+            >
+              {addrCopied ? "✓" : "⎘"}
+            </button>
           </div>
           <div className="text-xs text-gray-600 mt-0.5">
             First seen ~block #{analysis.firstSeenBlock.toLocaleString()}
