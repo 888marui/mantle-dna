@@ -200,11 +200,15 @@ function computeTraitsFromAddress(
   const diversityScore = seed(3) % 1000;
   const balanceEth = Number(balance) / 1e18;
 
-  // Use real on-chain tx count if available; fall back to deterministic estimate
-  const txCount = realTxCount ?? Math.floor(seed(5) / 10);
+  // Use real on-chain tx count if meaningful (>0), else use deterministic estimate.
+  // On Mantle Sepolia testnet, most addresses have 0 real txns, which would make
+  // everyone a "Newcomer" — the estimate preserves archetype diversity for demos.
+  const txCount = (realTxCount != null && realTxCount > 0)
+    ? realTxCount
+    : Math.floor(seed(5) / 10);
 
-  // Activity score: boost for wallets with real tx history
-  const activityScore = realTxCount != null
+  // Activity score: boost proportionally when real tx history exists
+  const activityScore = (realTxCount != null && realTxCount > 0)
     ? Math.min(1000, Math.floor((realTxCount / 500) * 1000) + (seed(4) % 200))
     : seed(4) % 1000;
 
