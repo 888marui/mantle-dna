@@ -25,11 +25,11 @@ interface Props {
   onMintDNA: () => void;
 }
 
-const SCORE_LABELS: Record<string, string> = {
-  deFiScore: "DeFi Engagement",
-  holdScore: "HODLing",
-  diversityScore: "Protocol Diversity",
-  activityScore: "On-chain Activity",
+const SCORE_LABELS: Record<string, { label: string; desc: string }> = {
+  deFiScore: { label: "DeFi Engagement", desc: "Protocol swap frequency, yield activity, and DeFi contract interactions" },
+  holdScore: { label: "HODLing", desc: "Long-term holding behavior, accumulation patterns, low sell frequency" },
+  diversityScore: { label: "Protocol Diversity", desc: "Range of DeFi protocols used across Mantle ecosystem" },
+  activityScore: { label: "On-chain Activity", desc: "Transaction volume, recency, and consistency of on-chain actions" },
 };
 
 /** Primary accent color per archetype index */
@@ -327,7 +327,13 @@ export function DNACard({ analysis }: Props) {
       {/* Score Bars */}
       <div className="space-y-3">
         {scores.map(({ key, value }) => (
-          <ScoreBar key={key} label={SCORE_LABELS[key]} value={value} accentColor={accentColor} />
+          <ScoreBar
+            key={key}
+            label={SCORE_LABELS[key].label}
+            desc={SCORE_LABELS[key].desc}
+            value={value}
+            accentColor={accentColor}
+          />
         ))}
       </div>
 
@@ -426,14 +432,17 @@ function scoreTier(v: number): string {
   return "Growing";
 }
 
-function ScoreBar({ label, value, accentColor }: { label: string; value: number; accentColor: string }) {
+function ScoreBar({ label, desc, value, accentColor }: { label: string; desc: string; value: number; accentColor: string }) {
   const pct = Math.round(value / 10);
   const tier = scoreTier(value);
 
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-xs">
-        <span className="text-gray-400">{label}</span>
+        <div>
+          <span className="text-gray-400">{label}</span>
+          <div className="text-[10px] text-gray-600 mt-0.5 leading-tight max-w-[200px]">{desc}</div>
+        </div>
         <div className="flex items-center gap-2">
           <span
             className="text-[10px] px-1.5 py-0.5 rounded-full"
