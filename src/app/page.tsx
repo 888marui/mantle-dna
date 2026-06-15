@@ -311,6 +311,13 @@ export default function Home() {
                 🔗 Shareable link
               </a>
               <span className="text-gray-700">•</span>
+              <a
+                href={`/compare?a=${analysis.address}`}
+                className="text-sm text-gray-500 hover:text-gray-400 underline underline-offset-4 transition-colors"
+              >
+                Compare wallets
+              </a>
+              <span className="text-gray-700">•</span>
               <button
                 onClick={() => { setAnalysis(null); setError(null); }}
                 className="text-sm text-gray-500 hover:text-gray-400 underline underline-offset-4 transition-colors"
@@ -503,6 +510,12 @@ export default function Home() {
               About
             </a>
             <a
+              href="/compare"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              Compare
+            </a>
+            <a
               href="https://mantle.xyz"
               target="_blank"
               rel="noopener noreferrer"
@@ -550,4 +563,5 @@ const features = [
   "📊 Mantle Ecosystem Score",
   "⬡ Share on Farcaster",
   "🧬 DNA Evolution Path",
+  "🔬 DNA Comparison",
 ];

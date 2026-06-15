@@ -15,9 +15,14 @@ export default function AboutPage() {
             <span className="text-2xl">🧬</span>
             <span className="text-xl font-bold text-white tracking-tight">Mantle DNA</span>
           </Link>
-          <Link href="/" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-            ← Try it
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/compare" className="text-sm text-gray-400 hover:text-emerald-400 transition-colors">
+              Compare
+            </Link>
+            <Link href="/" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+              ← Try it
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -72,8 +77,8 @@ export default function AboutPage() {
                 desc: "Claude Haiku (claude-haiku-4-5-20251001) generates a unique insight, 3 on-chain strengths, a risk watch-out, and a Mantle ecosystem prediction — grounded in the wallet's actual trait scores and network context. A deterministic fallback ensures insights always display even without an API key.",
               },
               {
-                step: "4. Visual DNA + Social Sharing + Evolution Path",
-                desc: "The wallet genome is rendered as: an animated double helix with labeled A-T/C-G base pairs, a 4-axis radar chart, a 32-character ATCG sequence, and a base composition breakdown (% A, T, C, G unique to each address). A DNA Evolution Path shows the next archetype to unlock, with score progress bars and 2 actionable Mantle protocol cards. Each wallet gets a shareable URL with a dynamically generated OG image (with network badge + Mantle Score) downloadable as a 1200×630 DNA Certificate PNG.",
+                step: "4. Visual DNA + Social Sharing + Evolution Path + Comparison",
+                desc: "The wallet genome is rendered as: an animated double helix with labeled A-T/C-G base pairs, a 4-axis radar chart, a 32-character ATCG sequence, and a base composition breakdown (% A, T, C, G unique to each address). A DNA Evolution Path shows the next archetype to unlock, with score progress bars and 2 actionable Mantle protocol cards. The /compare page lets you compare two wallets side-by-side with a DNA Compatibility Score (0-100), DNA Distance metric, per-trait comparison bars, and archetype-pair commentary. Each wallet gets a shareable URL with a dynamically generated OG image (with network badge + Mantle Score) downloadable as a 1200×630 DNA Certificate PNG.",
               },
               {
                 step: "5. Soulbound NFT Mint",
@@ -114,12 +119,13 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Public REST API</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Mantle DNA exposes a public JSON API for on-chain wallet analysis — no auth required.
-            Returns DNA scores, archetype, Mantle Ecosystem Score, and live token balances.
+            Mantle DNA exposes a public JSON API for on-chain wallet analysis and comparison — no auth required.
+            Returns DNA scores, archetype, Mantle Ecosystem Score, live token balances, and cross-wallet compatibility.
           </p>
-          <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
-            <div className="text-emerald-400">GET /api/wallet/{"{address}"}?network=mainnet</div>
-            <div className="text-gray-500 text-[11px] leading-relaxed">{`{
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+              <div className="text-emerald-400">GET /api/wallet/{"{address}"}?network=mainnet</div>
+              <div className="text-gray-500 text-[11px] leading-relaxed">{`{
   "address": "0x...",
   "network": "mainnet",
   "mntBalance": "12.3400",
@@ -133,6 +139,22 @@ export default function AboutPage() {
   "explorerUrl": "https://explorer.mantle.xyz/address/0x...",
   "analyzedAt": "2026-06-15T08:30:00.000Z"
 }`}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+              <div className="text-emerald-400">GET /api/compare?a={"{address}"}&b={"{address}"}&network=mainnet</div>
+              <div className="text-gray-500 text-[11px] leading-relaxed">{`{
+  "walletA": { "address": "0x...", "archetype": 0, "archetypeName": "DeFi Degen", "scores": {...}, "mantleScore": 45 },
+  "walletB": { "address": "0x...", "archetype": 1, "archetypeName": "Diamond Hands", "scores": {...}, "mantleScore": 72 },
+  "comparison": {
+    "compatibility": 40,
+    "dnaDistance": 0.83,
+    "scoreDiffs": { "deFiScore": 320, "holdScore": -410, "diversityScore": 65, "activityScore": 190 },
+    "dominantTraitA": "activityScore",
+    "dominantTraitB": "holdScore"
+  },
+  "analyzedAt": "2026-06-15T08:30:00.000Z"
+}`}</div>
+            </div>
           </div>
         </div>
 
@@ -164,7 +186,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
-              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing</div>
+              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing · DNA Comparison with compatibility score + DNA distance metric</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">🔗 Mantle Ecosystem (25%)</div>
@@ -172,7 +194,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">✅ Product Complete (20%)</div>
-              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Auto-analyze on paste/connect · Dual-network support</div>
+              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Compare wallets via /compare · Auto-analyze on paste/connect · Dual-network support · Public REST API (/api/wallet, /api/compare)</div>
             </div>
           </div>
         </div>

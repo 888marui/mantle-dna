@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       archetype,
       network = 'sepolia',
       tokenBalances = {},
+      mantleScore = 0,
     } = body;
 
     if (!address) {
@@ -47,6 +48,8 @@ DNA Scores (0-1000):
 - HODL Score: ${holdScore}/1000 — ${holdScore > 700 ? "diamond hands" : holdScore > 400 ? "balanced trader" : "active seller"}
 - Diversity Score: ${diversityScore}/1000 — ${diversityScore > 700 ? "multi-protocol explorer" : diversityScore > 400 ? "selectively diverse" : "focused on few protocols"}
 - Activity Score: ${activityScore}/1000 — ${activityScore > 700 ? "highly active on-chain" : activityScore > 400 ? "regularly active" : "occasional user"}
+
+Mantle Ecosystem Score: ${mantleScore}/100 — ${mantleScore >= 60 ? "deeply integrated with Mantle" : mantleScore >= 30 ? "moderately active on Mantle" : "early-stage Mantle user"}
 
 Archetype context:
 - "DeFi Degen": High-frequency swaps, yield chasing, protocol hopping; loves risky high-APY plays on Agni Finance and Merchant Moe
