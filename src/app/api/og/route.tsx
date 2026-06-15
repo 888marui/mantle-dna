@@ -39,6 +39,115 @@ function computeFromAddress(address: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  const isLanding = searchParams.get("landing") === "true";
+
+  // Landing page OG — show all archetypes as a grid
+  if (isLanding) {
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "1200px",
+            height: "630px",
+            background: "#0a0a0a",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+            overflow: "hidden",
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          {/* Radial glow */}
+          <div
+            style={{
+              position: "absolute",
+              width: "800px",
+              height: "500px",
+              borderRadius: "50%",
+              background: "radial-gradient(ellipse, rgba(16,185,129,0.15) 0%, transparent 70%)",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+            }}
+          />
+          {/* Border frame */}
+          <div
+            style={{
+              position: "absolute",
+              top: "20px",
+              left: "20px",
+              right: "20px",
+              bottom: "20px",
+              border: "1px solid rgba(16,185,129,0.3)",
+              borderRadius: "24px",
+              display: "flex",
+            }}
+          />
+          {/* Top accent */}
+          <div
+            style={{
+              position: "absolute",
+              top: "20px",
+              left: "120px",
+              right: "120px",
+              height: "2px",
+              background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.8), transparent)",
+              display: "flex",
+            }}
+          />
+          {/* Main content */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px", zIndex: 1, padding: "0 60px" }}>
+            <div style={{ fontSize: "14px", color: "#10b981", textTransform: "uppercase", letterSpacing: "6px" }}>
+              Mantle Network · AI-Powered
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <span style={{ fontSize: "64px" }}>🧬</span>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ fontSize: "72px", fontWeight: 900, color: "white", letterSpacing: "-3px", lineHeight: 1 }}>
+                  Mantle DNA
+                </div>
+                <div style={{ fontSize: "22px", color: "#6b7280", marginTop: "4px" }}>
+                  Discover your on-chain identity
+                </div>
+              </div>
+            </div>
+            {/* Archetype emoji row */}
+            <div style={{ display: "flex", gap: "20px", marginTop: "8px" }}>
+              {ARCHETYPES.map((a) => (
+                <div key={a.name} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                  <div
+                    style={{
+                      width: "72px",
+                      height: "72px",
+                      borderRadius: "16px",
+                      background: `${a.color}18`,
+                      border: `1px solid ${a.color}40`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "36px",
+                    }}
+                  >
+                    {a.emoji}
+                  </div>
+                  <div style={{ fontSize: "10px", color: a.color, fontWeight: 600 }}>{a.name.split(" ")[0]}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Bottom */}
+          <div style={{ position: "absolute", bottom: "36px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "15px", color: "#4b5563" }}>7 archetypes · AI insights · Soulbound NFT · mantle-dna.xyz</span>
+          </div>
+        </div>
+      ),
+      { width: 1200, height: 630 }
+    );
+  }
+
   const address = searchParams.get("address") || "0x0000000000000000000000000000000000000000";
 
   const computed = computeFromAddress(address);

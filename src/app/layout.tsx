@@ -19,11 +19,13 @@ export const metadata: Metadata = {
       "AI-powered wallet personality analysis. 7 archetypes. Soulbound NFT.",
     type: "website",
     siteName: "Mantle DNA",
+    images: [{ url: "/api/og?landing=true", width: 1200, height: 630, alt: "Mantle DNA — 7 On-chain Archetypes" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Mantle DNA",
     description: "Discover your on-chain DNA on Mantle Network",
+    images: ["/api/og?landing=true"],
   },
   keywords: [
     "Mantle",
