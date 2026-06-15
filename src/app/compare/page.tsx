@@ -283,6 +283,7 @@ export default function ComparePage() {
   const [loadingB, setLoadingB] = useState(false);
   const [errorA, setErrorA] = useState<string | null>(null);
   const [errorB, setErrorB] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const analyzeA = useCallback(async () => {
     if (!isAddress(addrA)) return;
@@ -461,17 +462,32 @@ export default function ComparePage() {
 
         {/* Share comparison link */}
         {analysisA && analysisB && (
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
                 const url = `${window.location.origin}/compare?a=${addrA}&b=${addrB}`;
                 navigator.clipboard.writeText(url).catch(() => {});
-                alert("Comparison link copied!");
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
               }}
-              className="text-xs text-emerald-600 hover:text-emerald-400 transition-colors underline underline-offset-2"
+              className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg border border-gray-700 hover:border-emerald-700 text-gray-400 hover:text-emerald-400 transition-colors"
             >
-              Copy shareable comparison link
+              {copied ? "✓ Copied!" : "🔗 Copy comparison link"}
             </button>
+            {analysisA && analysisB && (() => {
+              const compat = getCompatScore(analysisA.archetype, analysisB.archetype);
+              const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${window.location.origin}/compare?a=${addrA}&b=${addrB}\n#MantleDNA #Mantle`;
+              return (
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-black hover:bg-gray-900 border border-gray-700 text-white transition-colors"
+                >
+                  Share on 𝕏
+                </a>
+              );
+            })()}
           </div>
         )}
 
