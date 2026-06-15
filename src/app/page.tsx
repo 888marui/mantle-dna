@@ -140,7 +140,7 @@ export default function Home() {
   };
 
   const handleAnalyzeSelf = () => {
-    if (address) handleAnalyze(address, 'sepolia');
+    if (address) handleAnalyze(address, 'mainnet');
   };
 
   return (

@@ -195,6 +195,9 @@ export function DNACard({ analysis }: Props) {
         style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
       >
         <span className="text-gray-700">›</span> {analysis.archetypeReason}
+        {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
+          <span className="ml-2 text-emerald-700">· adjusted by real token data</span>
+        )}
       </div>
 
       {/* Total DNA Score */}
@@ -323,6 +326,33 @@ export function DNACard({ analysis }: Props) {
           <div className="text-sm font-semibold" style={{ color: accentColor }}>View ↗</div>
         </a>
       </div>
+
+      {/* Token Holdings (mainnet only, when real data available) */}
+      {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-gray-500 uppercase tracking-wider">Real Token Holdings</div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-500 border border-emerald-900">
+              live on-chain
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(analysis.tokenBalances).map(([symbol, amount]) => (
+              <div
+                key={symbol}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs"
+                style={{
+                  background: `${accentColor}10`,
+                  border: `1px solid ${accentColor}30`,
+                }}
+              >
+                <span className="text-gray-400 font-medium">{symbol}</span>
+                <span style={{ color: accentColor }} className="font-semibold font-mono">{amount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Score Bars */}
       <div className="space-y-3">

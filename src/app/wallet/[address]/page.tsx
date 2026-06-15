@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/analyzer";
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { WalletButton } from "@/components/WalletButton";
 import Link from "next/link";
+
+const LOADING_STAGES = [
+  "Fetching on-chain data...",
+  "Computing DNA traits...",
+  "Running AI analysis...",
+];
 
 export default function WalletPage({ params }: { params: { address: string } }) {
   const { address } = params;
@@ -15,6 +21,36 @@ export default function WalletPage({ params }: { params: { address: string } }) 
   const [analysis, setAnalysis] = useState<WalletAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [blockNumber, setBlockNumber] = useState<number | null>(null);
+
+  const rpcUrl = network === 'mainnet'
+    ? (process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz")
+    : (process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz");
+
+  const fetchBlock = useCallback(() => {
+    fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "eth_blockNumber", params: [], id: 1 }),
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.result) setBlockNumber(parseInt(d.result, 16)); })
+      .catch(() => {});
+  }, [rpcUrl]);
+
+  useEffect(() => {
+    fetchBlock();
+  }, [fetchBlock]);
+
+  useEffect(() => {
+    if (!loading) { setLoadingStage(0); return; }
+    setLoadingStage(0);
+    const interval = setInterval(() => {
+      setLoadingStage((prev) => (prev + 1) % LOADING_STAGES.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [loading]);
 
   useEffect(() => {
     if (!address) return;
@@ -58,8 +94,16 @@ export default function WalletPage({ params }: { params: { address: string } }) 
             </div>
           </div>
 
-          {/* Right: wallet button */}
-          <WalletButton />
+          {/* Right: live block + wallet button */}
+          <div className="flex items-center gap-3">
+            {blockNumber && (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                #{blockNumber.toLocaleString()}
+              </div>
+            )}
+            <WalletButton />
+          </div>
         </div>
       </header>
 
@@ -68,7 +112,19 @@ export default function WalletPage({ params }: { params: { address: string } }) 
         {loading && (
           <div className="flex flex-col items-center gap-4 py-16">
             <div className="text-5xl animate-spin">🧬</div>
-            <p className="text-emerald-400 font-medium">Decoding on-chain DNA...</p>
+            <p className="text-emerald-400 font-medium">{LOADING_STAGES[loadingStage]}</p>
+            <div className="flex gap-2">
+              {LOADING_STAGES.map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: i === loadingStage ? "24px" : "8px",
+                    background: i === loadingStage ? "#10b981" : "#374151",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )}
 

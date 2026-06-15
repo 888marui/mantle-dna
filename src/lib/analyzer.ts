@@ -27,8 +27,26 @@ export interface WalletAnalysis extends WalletTraits {
   aiStrengths?: string[];
   aiWatchOut?: string;
   aiPrediction?: string;
-  protocolAffinity: string[];  // Mantle protocols this wallet would likely use
+  protocolAffinity: string[];
+  tokenBalances?: Record<string, string>;  // Real ERC-20 balances from Mantle
 }
+
+const ERC20_ABI = [
+  {
+    name: "balanceOf",
+    type: "function",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+] as const;
+
+// Key Mantle Mainnet token addresses for real on-chain scoring
+const MAINNET_TOKENS: Array<{ symbol: string; address: `0x${string}`; decimals: number }> = [
+  { symbol: "USDT", address: "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE", decimals: 6 },
+  { symbol: "USDC", address: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9", decimals: 6 },
+  { symbol: "mETH", address: "0xcDA86A272531e8640cD7F1a92c01839911B90bb0", decimals: 18 },
+];
 
 const ARCHETYPES = [
   {
@@ -143,7 +161,32 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
   const mntBalance = (Number(balance) / 1e18).toFixed(4);
   const realTxCount = txCount ?? undefined;
 
-  const traits = computeTraitsFromAddress(address, latestBlock, balance, realTxCount);
+  // Fetch real ERC-20 token balances on mainnet for richer on-chain scoring
+  const tokenBalances: Record<string, string> = {};
+  if (network === 'mainnet') {
+    const tokenResults = await Promise.allSettled(
+      MAINNET_TOKENS.map((token) =>
+        client.readContract({
+          address: token.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          args: [addr],
+        })
+      )
+    );
+    MAINNET_TOKENS.forEach((token, i) => {
+      const result = tokenResults[i];
+      if (result.status === "fulfilled") {
+        const raw = result.value as bigint;
+        const amount = Number(raw) / 10 ** token.decimals;
+        if (amount > 0.0001) {
+          tokenBalances[token.symbol] = amount >= 1 ? amount.toFixed(2) : amount.toFixed(4);
+        }
+      }
+    });
+  }
+
+  const traits = computeTraitsFromAddress(address, latestBlock, balance, realTxCount, tokenBalances);
   const archetype = ARCHETYPES[traits.archetype];
 
   const analysis: WalletAnalysis = {
@@ -155,6 +198,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
     mntBalance,
     address,
     network,
+    tokenBalances: Object.keys(tokenBalances).length > 0 ? tokenBalances : undefined,
     protocolAffinity: computeProtocolAffinity(traits.archetype, traits.deFiScore, traits.holdScore, traits.diversityScore),
   };
 
@@ -178,6 +222,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
         activityScore: traits.activityScore,
         archetype: archetype.name,
         network,
+        tokenBalances,
       }),
     });
 
@@ -207,15 +252,36 @@ function computeTraitsFromAddress(
   address: string,
   latestBlock: bigint,
   balance: bigint,
-  realTxCount?: number
+  realTxCount?: number,
+  tokenBalances: Record<string, string> = {}
 ): WalletTraits {
   const bytes = address.toLowerCase().replace("0x", "");
   const seed = (i: number) => parseInt(bytes.slice(i * 2, i * 2 + 4), 16);
+  const clamp = (v: number) => Math.min(1000, Math.max(0, Math.round(v)));
 
-  const deFiScore = seed(1) % 1000;
-  const holdScore = seed(2) % 1000;
-  const diversityScore = seed(3) % 1000;
+  let deFiScore = seed(1) % 1000;
+  let holdScore = seed(2) % 1000;
+  let diversityScore = seed(3) % 1000;
   const balanceEth = Number(balance) / 1e18;
+
+  // Apply real token data to adjust scores (mainnet only — tokenBalances empty on Sepolia)
+  const mEthBalance = parseFloat(tokenBalances.mETH || "0");
+  const stableBalance = parseFloat(tokenBalances.USDT || "0") + parseFloat(tokenBalances.USDC || "0");
+  const tokenCount = Object.keys(tokenBalances).length;
+
+  if (mEthBalance > 0) {
+    // mETH staking → HODLing behavior + DeFi participation
+    holdScore = clamp(holdScore + Math.min(200, Math.floor(mEthBalance * 10)));
+    deFiScore = clamp(deFiScore + Math.min(100, Math.floor(mEthBalance * 5)));
+  }
+  if (stableBalance > 0) {
+    // Stablecoin holdings → active trading/yield farming
+    deFiScore = clamp(deFiScore + Math.min(100, Math.floor(stableBalance / 20)));
+  }
+  if (tokenCount >= 2) {
+    // Multi-token wallet → protocol diversity
+    diversityScore = clamp(diversityScore + tokenCount * 80);
+  }
 
   // Use real on-chain tx count if meaningful (>0), else use deterministic estimate.
   // On Mantle Sepolia testnet, most addresses have 0 real txns, which would make

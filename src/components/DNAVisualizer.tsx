@@ -59,9 +59,8 @@ export function DNAVisualizer({ analysis }: Props) {
 
       {/* DNA Helix SVG */}
       <div className="flex justify-center">
-        <svg width="200" height="280" viewBox="0 0 200 280" className="overflow-visible">
+        <svg width="220" height="280" viewBox="0 0 220 280" className="overflow-visible">
           <defs>
-            {/* Radial glow filter for nodes */}
             <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
               <feMerge>
@@ -74,9 +73,15 @@ export function DNAVisualizer({ analysis }: Props) {
           {strands.map((strand, i) => {
             const delayLeft = ((i * 2) / (strands.length * 2)) * pulseBase;
             const delayRight = ((i * 2 + 1) / (strands.length * 2)) * pulseBase;
+            // Base pairs: A-T and C-G from address nibbles
+            const hex = analysis.address.toLowerCase().replace("0x", "");
+            const nibble = parseInt(hex[i % hex.length] || "0", 16);
+            const PAIR_LABELS = [["A", "T"], ["T", "A"], ["C", "G"], ["G", "C"]];
+            const [leftBase, rightBase] = PAIR_LABELS[nibble % 4];
+            const showLabel = strand.opacity > 0.65; // only label prominent nodes
             return (
               <g key={i}>
-                {/* Rung connecting the two nodes — rendered first so nodes sit on top */}
+                {/* Rung */}
                 <line
                   x1={strand.leftX}
                   y1={strand.y}
@@ -84,10 +89,10 @@ export function DNAVisualizer({ analysis }: Props) {
                   y2={strand.y}
                   stroke={strand.color}
                   strokeWidth={1.5}
-                  opacity={strand.opacity * 0.5}
+                  opacity={strand.opacity * 0.4}
                 />
 
-                {/* Left backbone node */}
+                {/* Left node */}
                 <circle
                   cx={strand.leftX}
                   cy={strand.y}
@@ -95,12 +100,24 @@ export function DNAVisualizer({ analysis }: Props) {
                   fill={strand.color}
                   opacity={strand.opacity}
                   filter="url(#nodeGlow)"
-                  style={{
-                    animation: `helixPulse ${pulseBase}s ease-in-out ${delayLeft.toFixed(3)}s infinite`,
-                  }}
+                  style={{ animation: `helixPulse ${pulseBase}s ease-in-out ${delayLeft.toFixed(3)}s infinite` }}
                 />
+                {showLabel && (
+                  <text
+                    x={strand.leftX - 11}
+                    y={strand.y + 3.5}
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontWeight="700"
+                    fill={strand.color}
+                    opacity={strand.opacity * 0.8}
+                    fontFamily="monospace"
+                  >
+                    {leftBase}
+                  </text>
+                )}
 
-                {/* Right backbone node */}
+                {/* Right node */}
                 <circle
                   cx={strand.rightX}
                   cy={strand.y}
@@ -108,10 +125,22 @@ export function DNAVisualizer({ analysis }: Props) {
                   fill={strand.color}
                   opacity={strand.opacity}
                   filter="url(#nodeGlow)"
-                  style={{
-                    animation: `helixPulse ${pulseBase}s ease-in-out ${delayRight.toFixed(3)}s infinite`,
-                  }}
+                  style={{ animation: `helixPulse ${pulseBase}s ease-in-out ${delayRight.toFixed(3)}s infinite` }}
                 />
+                {showLabel && (
+                  <text
+                    x={strand.rightX + 11}
+                    y={strand.y + 3.5}
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontWeight="700"
+                    fill={strand.color}
+                    opacity={strand.opacity * 0.8}
+                    fontFamily="monospace"
+                  >
+                    {rightBase}
+                  </text>
+                )}
               </g>
             );
           })}
