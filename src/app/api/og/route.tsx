@@ -57,6 +57,16 @@ export async function GET(req: NextRequest) {
   const shortAddr = `${address.slice(0, 10)}...${address.slice(-8)}`;
   const totalPct = Math.round((defi + hodl + diversity + activity) / 40);
 
+  // Generate ATCG DNA sequence from address (unique per wallet)
+  const hex = address.toLowerCase().replace("0x", "");
+  const bases = ["A", "T", "C", "G"];
+  let dnaSequence = "";
+  for (let i = 0; i < 24; i++) {
+    const nibble = parseInt(hex[i % hex.length], 16) || 0;
+    dnaSequence += bases[nibble % 4];
+    if ((i + 1) % 8 === 0 && i < 23) dnaSequence += " ";
+  }
+
   return new ImageResponse(
     (
       <div
@@ -214,19 +224,33 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
+        {/* DNA sequence */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "68px",
+            fontFamily: "monospace",
+            fontSize: "13px",
+            letterSpacing: "3px",
+            color: `${color}50`,
+          }}
+        >
+          {dnaSequence}
+        </div>
+
         {/* Bottom branding */}
         <div
           style={{
             position: "absolute",
-            bottom: "44px",
+            bottom: "36px",
             display: "flex",
             alignItems: "center",
             gap: "8px",
           }}
         >
-          <span style={{ fontSize: "20px" }}>🧬</span>
-          <span style={{ fontSize: "17px", color: "#4b5563" }}>mantle-dna.xyz</span>
-          <span style={{ fontSize: "13px", color: "#374151", marginLeft: "8px" }}>
+          <span style={{ fontSize: "18px" }}>🧬</span>
+          <span style={{ fontSize: "15px", color: "#4b5563" }}>mantle-dna.xyz</span>
+          <span style={{ fontSize: "12px", color: "#374151", marginLeft: "8px" }}>
             • Mantle Network
           </span>
         </div>
