@@ -120,7 +120,8 @@ export default function Home() {
   useEffect(() => {
     setRecentAnalyses(loadRecent());
     const t = setTimeout(() => setStatsMounted(true), 300);
-    fetch(process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz", {
+    // Show Mainnet block number since we default to mainnet analysis
+    fetch(process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", method: "eth_blockNumber", params: [], id: 1 }),
@@ -170,6 +171,14 @@ export default function Home() {
   const handleAnalyzeSelf = () => {
     if (address) handleAnalyze(address, 'mainnet');
   };
+
+  // Auto-analyze when wallet first connects (no analysis yet, not loading)
+  useEffect(() => {
+    if (isConnected && address && !analysis && !loading && !error) {
+      handleAnalyze(address, 'mainnet');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address]);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
