@@ -36,13 +36,13 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { name: "Next.js 14", role: "App Router, API routes, Edge runtime OG images", icon: "⚡" },
-              { name: "Mantle RPC (dual-network)", role: "Real-time balance + tx count on Mainnet & Sepolia", icon: "🔗" },
-              { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK", icon: "🤖" },
-              { name: "viem + wagmi v2", role: "Type-safe Ethereum interactions + wallet connect", icon: "🔧" },
-              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards (wallet + landing)", icon: "🖼️" },
-              { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI hash", icon: "🎭" },
-              { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with full test coverage", icon: "⛓️" },
-              { name: "Tailwind CSS + SVG", role: "Animated DNA helix, radar chart, archetype art", icon: "🎨" },
+              { name: "Mantle RPC (dual-network)", role: "Live MNT balance, tx count, and ERC-20 tokens on Mainnet & Sepolia", icon: "🔗" },
+              { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK — references real token data", icon: "🤖" },
+              { name: "viem + wagmi v2", role: "Type-safe Ethereum + ERC-20 readContract, wallet connect for both chains", icon: "🔧" },
+              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards downloadable as DNA Certificates", icon: "🖼️" },
+              { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI insight keccak256 hash", icon: "🎭" },
+              { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with self-mint, oracle-mint, and full test coverage", icon: "⛓️" },
+              { name: "Tailwind CSS + SVG", role: "Animated DNA helix with ATCG labels, radar chart, base composition", icon: "🎨" },
             ].map((item) => (
               <div key={item.name} className="p-4 rounded-xl bg-gray-900/60 border border-gray-800 flex gap-3">
                 <span className="text-xl">{item.icon}</span>
@@ -61,7 +61,7 @@ export default function AboutPage() {
             {[
               {
                 step: "1. Dual-Network On-Chain Analysis",
-                desc: "Submit a wallet address with Mantle Mainnet or Sepolia network selection. We fetch the real MNT balance and transaction nonce via RPC (with a 10s timeout). These feed into a trait computation engine calculating DeFi Engagement, HODLing, Protocol Diversity, and On-chain Activity scores (0–1000 each).",
+                desc: "Submit a wallet address with Mantle Mainnet or Sepolia selection. We fetch the real MNT balance, transaction nonce, and on Mainnet — real ERC-20 token balances (USDT, USDC, mETH) via readContract. These feed into a trait computation engine calculating DeFi Engagement, HODLing, Protocol Diversity, and On-chain Activity scores (0–1000 each), adjusted by actual token holdings.",
               },
               {
                 step: "2. Rule-Based Archetype Classification",
@@ -73,7 +73,7 @@ export default function AboutPage() {
               },
               {
                 step: "4. Visual DNA + Social Sharing",
-                desc: "The wallet genome is rendered as an animated double helix, a 4-axis radar chart (DeFi/Activity/HODLing/Diversity), and a unique ATCG base sequence derived from the address hex. Each wallet gets a shareable /wallet/[address] URL with a dynamically generated 1200×630 OG image for rich Twitter preview cards. The main landing page also has its own OG image showing all 7 archetypes.",
+                desc: "The wallet genome is rendered as: an animated double helix with labeled A-T/C-G base pairs, a 4-axis radar chart, a 32-character ATCG sequence, and a base composition breakdown (% A, T, C, G unique to each address). Each wallet gets a shareable URL with a dynamically generated OG image downloadable as a 1200×630 DNA Certificate PNG.",
               },
               {
                 step: "5. Soulbound NFT Mint",
