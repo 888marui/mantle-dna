@@ -511,7 +511,7 @@ export default function Home() {
               Mantle ↗
             </a>
             <a
-              href="https://explorer.sepolia.mantle.xyz"
+              href="https://explorer.mantle.xyz"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-emerald-500 transition-colors"
