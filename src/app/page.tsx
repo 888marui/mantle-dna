@@ -244,17 +244,13 @@ export default function Home() {
               <DNACard analysis={analysis} onMintDNA={() => {}} />
               <DNAVisualizer analysis={analysis} />
             </div>
-            {/* Share on X after analysis */}
+            {/* Shareable link */}
             <div className="flex justify-center">
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🧬 Just discovered my Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\nmantle-dna.xyz\n#MantleDNA #Mantle #Web3`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-semibold border border-gray-700 transition-colors"
+                href={`/wallet/${analysis.address}`}
+                className="text-sm text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors"
               >
-                <span>Share your DNA on 𝕏</span>
+                🔗 Share this DNA result: /wallet/{analysis.address.slice(0, 10)}...
               </a>
             </div>
           </div>
