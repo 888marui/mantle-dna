@@ -14,6 +14,7 @@ describe("WalletDNA", function () {
     activityScore: 900,
     firstSeenBlock: 1000000,
     analyzedAt: Math.floor(Date.now() / 1000),
+    aiInsightHash: ethers.keccak256(ethers.toUtf8Bytes("Your DeFi DNA is strong.")),
   };
 
   const SAMPLE_TOKEN_URI = "ipfs://QmWalletDNAMetadata";
@@ -57,10 +58,25 @@ describe("WalletDNA", function () {
       expect(traits.holdScore).to.equal(sampleTraits.holdScore);
     });
 
-    it("should not allow non-analyzer to mint", async function () {
+    it("should allow wallet to self-mint its own DNA", async function () {
+      await walletDNA.connect(user1).mintDNA(user1.address, SAMPLE_TOKEN_URI, sampleTraits);
+
+      const tokenId = await walletDNA.walletToTokenId(user1.address);
+      expect(tokenId).to.equal(1n);
+      expect(await walletDNA.ownerOf(1n)).to.equal(user1.address);
+    });
+
+    it("should not allow one wallet to mint DNA for another wallet", async function () {
       await expect(
         walletDNA.connect(user1).mintDNA(user2.address, SAMPLE_TOKEN_URI, sampleTraits)
-      ).to.be.revertedWith("Not authorized analyzer");
+      ).to.be.revertedWith("Not authorized: must be wallet owner, analyzer, or contract owner");
+    });
+
+    it("should store aiInsightHash in traits", async function () {
+      await walletDNA.connect(analyzer).mintDNA(user1.address, SAMPLE_TOKEN_URI, sampleTraits);
+
+      const traits = await walletDNA.getWalletDNA(user1.address);
+      expect(traits.aiInsightHash).to.equal(sampleTraits.aiInsightHash);
     });
 
     it("should not allow minting twice for same wallet", async function () {
