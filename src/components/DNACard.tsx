@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { type WalletAnalysis, getExplorerUrl } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
@@ -54,6 +55,7 @@ const ARCHETYPE_RARITY: Record<number, string> = {
 };
 
 export function DNACard({ analysis }: Props) {
+  const [addrCopied, setAddrCopied] = useState(false);
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
@@ -111,6 +113,7 @@ export function DNACard({ analysis }: Props) {
         boxShadow: `0 0 0 1px ${accentColor}40, 0 4px 32px ${accentColor}18`,
         background: `linear-gradient(#111827cc, #111827cc) padding-box,
                      linear-gradient(135deg, ${accentColor}60, transparent 50%, ${accentColor}30) border-box`,
+        animation: "fadeSlideIn 0.4s ease-out both",
       }}
     >
       {/* Subtle top-edge glow line */}
@@ -177,8 +180,21 @@ export function DNACard({ analysis }: Props) {
               {analysis.network === 'mainnet' ? '🟢 Mainnet' : '🔵 Sepolia'}
             </span>
           </div>
-          <div className="text-xs text-gray-500 font-mono mt-1">
-            {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-xs text-gray-500 font-mono">
+              {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(analysis.address).catch(() => {});
+                setAddrCopied(true);
+                setTimeout(() => setAddrCopied(false), 1500);
+              }}
+              className="text-[10px] px-1 py-0.5 rounded text-gray-600 hover:text-gray-400 transition-colors"
+              title="Copy address"
+            >
+              {addrCopied ? "✓" : "⎘"}
+            </button>
           </div>
           <div className="text-xs text-gray-600 mt-0.5">
             First seen ~block #{analysis.firstSeenBlock.toLocaleString()}
@@ -195,6 +211,9 @@ export function DNACard({ analysis }: Props) {
         style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
       >
         <span className="text-gray-700">›</span> {analysis.archetypeReason}
+        {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
+          <span className="ml-2 text-emerald-700">· adjusted by real token data</span>
+        )}
       </div>
 
       {/* Total DNA Score */}
@@ -324,6 +343,33 @@ export function DNACard({ analysis }: Props) {
         </a>
       </div>
 
+      {/* Token Holdings (mainnet only, when real data available) */}
+      {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-gray-500 uppercase tracking-wider">Real Token Holdings</div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-500 border border-emerald-900">
+              live on-chain
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(analysis.tokenBalances).map(([symbol, amount]) => (
+              <div
+                key={symbol}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs"
+                style={{
+                  background: `${accentColor}10`,
+                  border: `1px solid ${accentColor}30`,
+                }}
+              >
+                <span className="text-gray-400 font-medium">{symbol}</span>
+                <span style={{ color: accentColor }} className="font-semibold font-mono">{amount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Score Bars */}
       <div className="space-y-3">
         {scores.map(({ key, value }) => (
@@ -337,8 +383,24 @@ export function DNACard({ analysis }: Props) {
         ))}
       </div>
 
-      {/* Share Button */}
-      <ShareButton analysis={analysis} />
+      {/* Share + Download row */}
+      <div className="space-y-2">
+        <ShareButton analysis={analysis} />
+        <a
+          href={`/api/og?${new URLSearchParams({
+            address: analysis.address,
+            archetype: String(analysis.archetype),
+            defi: String(analysis.deFiScore),
+            hodl: String(analysis.holdScore),
+            diversity: String(analysis.diversityScore),
+            activity: String(analysis.activityScore),
+          }).toString()}`}
+          download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${analysis.address.slice(0, 8)}.png`}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-600 text-xs font-medium transition-colors"
+        >
+          ↓ Download DNA Certificate (1200×630)
+        </a>
+      </div>
 
       {/* Mint Button */}
       {isSuccess ? (
@@ -453,16 +515,18 @@ function ScoreBar({ label, desc, value, accentColor }: { label: string; desc: st
           >
             {tier}
           </span>
-          <span className="text-gray-500">{value}</span>
+          <span className="text-gray-500 font-mono">{value}</span>
         </div>
       </div>
       <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-700"
+          className="h-full rounded-full"
           style={{
             width: `${pct}%`,
             background: `linear-gradient(90deg, ${accentColor}aa, ${accentColor})`,
             boxShadow: `0 0 6px ${accentColor}60`,
+            animation: `fillBar 0.9s cubic-bezier(0.4,0,0.2,1) both`,
+            ["--bar-width" as string]: `${pct}%`,
           }}
         />
       </div>

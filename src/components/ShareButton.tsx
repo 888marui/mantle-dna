@@ -14,8 +14,16 @@ export function ShareButton({ analysis }: Props) {
     ? window.location.origin
     : "https://mantle-dna.xyz";
 
-  const networkParam = analysis.network === 'mainnet' ? '?network=mainnet' : '';
-  const walletUrl = `${appUrl}/wallet/${analysis.address}${networkParam}`;
+  // Include archetype + scores in URL so the OG image reflects actual analysis results
+  const ogParams = new URLSearchParams({
+    archetype: String(analysis.archetype),
+    defi: String(analysis.deFiScore),
+    hodl: String(analysis.holdScore),
+    diversity: String(analysis.diversityScore),
+    activity: String(analysis.activityScore),
+  });
+  if (analysis.network === 'mainnet') ogParams.set('network', 'mainnet');
+  const walletUrl = `${appUrl}/wallet/${analysis.address}?${ogParams.toString()}`;
 
   const tweetText = `🧬 My Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\n${walletUrl}\n#MantleDNA #Mantle #Web3`;
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;

@@ -140,7 +140,7 @@ export default function Home() {
   };
 
   const handleAnalyzeSelf = () => {
-    if (address) handleAnalyze(address, 'sepolia');
+    if (address) handleAnalyze(address, 'mainnet');
   };
 
   return (
@@ -334,7 +334,7 @@ export default function Home() {
               </h2>
               <p className="text-xs text-gray-600">Which one are you?</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
               {ARCHETYPES_GALLERY.map((a) => (
                 <div
                   key={a.name}

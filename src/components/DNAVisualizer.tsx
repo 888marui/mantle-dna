@@ -44,6 +44,7 @@ export function DNAVisualizer({ analysis }: Props) {
         boxShadow: `0 0 0 1px ${accentColor}40, 0 4px 32px ${accentColor}18`,
         background: `linear-gradient(#111827cc, #111827cc) padding-box,
                      linear-gradient(135deg, ${accentColor}60, transparent 50%, ${accentColor}30) border-box`,
+        animation: "fadeSlideIn 0.4s ease-out 0.1s both",
       }}
     >
       {/* Subtle top-edge glow line */}
@@ -59,9 +60,8 @@ export function DNAVisualizer({ analysis }: Props) {
 
       {/* DNA Helix SVG */}
       <div className="flex justify-center">
-        <svg width="200" height="280" viewBox="0 0 200 280" className="overflow-visible">
+        <svg width="220" height="280" viewBox="0 0 220 280" className="overflow-visible">
           <defs>
-            {/* Radial glow filter for nodes */}
             <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
               <feMerge>
@@ -74,9 +74,15 @@ export function DNAVisualizer({ analysis }: Props) {
           {strands.map((strand, i) => {
             const delayLeft = ((i * 2) / (strands.length * 2)) * pulseBase;
             const delayRight = ((i * 2 + 1) / (strands.length * 2)) * pulseBase;
+            // Base pairs: A-T and C-G from address nibbles
+            const hex = analysis.address.toLowerCase().replace("0x", "");
+            const nibble = parseInt(hex[i % hex.length] || "0", 16);
+            const PAIR_LABELS = [["A", "T"], ["T", "A"], ["C", "G"], ["G", "C"]];
+            const [leftBase, rightBase] = PAIR_LABELS[nibble % 4];
+            const showLabel = strand.opacity > 0.65; // only label prominent nodes
             return (
               <g key={i}>
-                {/* Rung connecting the two nodes — rendered first so nodes sit on top */}
+                {/* Rung */}
                 <line
                   x1={strand.leftX}
                   y1={strand.y}
@@ -84,10 +90,10 @@ export function DNAVisualizer({ analysis }: Props) {
                   y2={strand.y}
                   stroke={strand.color}
                   strokeWidth={1.5}
-                  opacity={strand.opacity * 0.5}
+                  opacity={strand.opacity * 0.4}
                 />
 
-                {/* Left backbone node */}
+                {/* Left node */}
                 <circle
                   cx={strand.leftX}
                   cy={strand.y}
@@ -95,12 +101,24 @@ export function DNAVisualizer({ analysis }: Props) {
                   fill={strand.color}
                   opacity={strand.opacity}
                   filter="url(#nodeGlow)"
-                  style={{
-                    animation: `helixPulse ${pulseBase}s ease-in-out ${delayLeft.toFixed(3)}s infinite`,
-                  }}
+                  style={{ animation: `helixPulse ${pulseBase}s ease-in-out ${delayLeft.toFixed(3)}s infinite` }}
                 />
+                {showLabel && (
+                  <text
+                    x={strand.leftX - 11}
+                    y={strand.y + 3.5}
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontWeight="700"
+                    fill={strand.color}
+                    opacity={strand.opacity * 0.8}
+                    fontFamily="monospace"
+                  >
+                    {leftBase}
+                  </text>
+                )}
 
-                {/* Right backbone node */}
+                {/* Right node */}
                 <circle
                   cx={strand.rightX}
                   cy={strand.y}
@@ -108,10 +126,22 @@ export function DNAVisualizer({ analysis }: Props) {
                   fill={strand.color}
                   opacity={strand.opacity}
                   filter="url(#nodeGlow)"
-                  style={{
-                    animation: `helixPulse ${pulseBase}s ease-in-out ${delayRight.toFixed(3)}s infinite`,
-                  }}
+                  style={{ animation: `helixPulse ${pulseBase}s ease-in-out ${delayRight.toFixed(3)}s infinite` }}
                 />
+                {showLabel && (
+                  <text
+                    x={strand.rightX + 11}
+                    y={strand.y + 3.5}
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontWeight="700"
+                    fill={strand.color}
+                    opacity={strand.opacity * 0.8}
+                    fontFamily="monospace"
+                  >
+                    {rightBase}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -135,12 +165,14 @@ export function DNAVisualizer({ analysis }: Props) {
         </div>
       </div>
 
+      {/* Base Composition */}
+      <BaseComposition address={analysis.address} accentColor={accentColor} />
+
       {/* Timestamp */}
       <div className="text-xs text-gray-600 text-center">
         Analyzed {new Date(analysis.analyzedAt * 1000).toLocaleString()}
       </div>
 
-      {/* Keyframe for node pulse */}
       <style>{`
         @keyframes helixPulse {
           0%, 100% { r: 5.5; opacity: var(--base-opacity, 0.8); }
@@ -304,6 +336,50 @@ function RadarChart({ analysis, accentColor }: { analysis: WalletAnalysis; accen
         {/* Center dot */}
         <circle cx={cx} cy={cy} r={3} fill={`${accentColor}60`} />
       </svg>
+    </div>
+  );
+}
+
+function BaseComposition({ address, accentColor }: { address: string; accentColor: string }) {
+  const hex = address.toLowerCase().replace("0x", "");
+  const counts: Record<string, number> = { A: 0, T: 0, C: 0, G: 0 };
+  const bases = ["A", "T", "C", "G"] as const;
+
+  for (let i = 0; i < Math.min(hex.length, 40); i++) {
+    const nibble = parseInt(hex[i], 16) || 0;
+    counts[bases[nibble % 4]]++;
+  }
+
+  const total = Object.values(counts).reduce((s, n) => s + n, 0);
+  const BASE_COLORS: Record<string, string> = { A: "#10b981", T: "#3b82f6", C: "#f97316", G: "#a855f7" };
+
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-gray-600 uppercase tracking-wider">Base Composition</div>
+      <div className="grid grid-cols-4 gap-2">
+        {bases.map((base) => {
+          const pct = Math.round((counts[base] / total) * 100);
+          const color = BASE_COLORS[base];
+          return (
+            <div key={base} className="space-y-1 text-center">
+              <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${pct}%`,
+                    background: color,
+                    animation: "fillBar 1s cubic-bezier(0.4,0,0.2,1) both",
+                    ["--bar-width" as string]: `${pct}%`,
+                  }}
+                />
+              </div>
+              <div className="text-[10px] font-mono" style={{ color }}>
+                {base} <span className="text-gray-600">{pct}%</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

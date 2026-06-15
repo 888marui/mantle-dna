@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       activityScore,
       archetype,
       network = 'sepolia',
+      tokenBalances = {},
     } = body;
 
     if (!address) {
@@ -25,13 +26,21 @@ export async function POST(req: NextRequest) {
     }
 
     const networkLabel = network === 'mainnet' ? 'Mantle Mainnet' : 'Mantle Sepolia testnet';
+
+    const tokenLines = Object.entries(tokenBalances as Record<string, string>)
+      .map(([sym, amt]) => `- ${sym}: ${amt}`)
+      .join("\n");
+    const tokenSection = tokenLines
+      ? `\nReal ERC-20 Holdings on Mantle:\n${tokenLines}\n`
+      : "";
+
     const prompt = `You are a witty on-chain DNA analyst for Mantle Network. Analyze this wallet's on-chain genome:
 
 Wallet: ${address}
 Network: ${networkLabel}
 Archetype: ${archetype} (their dominant on-chain personality)
 MNT Balance: ${balance} MNT
-Transaction Count: ${txCount}
+Transaction Count: ${txCount}${tokenSection}
 
 DNA Scores (0-1000):
 - DeFi Score: ${deFiScore}/1000 — ${deFiScore > 700 ? "heavy protocol user" : deFiScore > 400 ? "moderate DeFi participant" : "minimal DeFi activity"}
@@ -48,7 +57,7 @@ Archetype context:
 - "Whale": Large positions; market-moving potential; strategic moves on Init Capital and Lendle
 - "Trader": Active DEX user on Merchant Moe; sharp timing; reads charts; executes with precision
 
-Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values in your analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
+Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values and real token holdings (if present) in your analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
 {
   "insight": "2 punchy sentences that capture their Web3 personality based on their specific scores. Reference actual numbers. Be insightful and a bit cheeky.",
   "strengths": ["3 specific on-chain skills this wallet excels at based on their score pattern — e.g. 'Liquidity timing', 'Protocol risk assessment', 'MNT accumulation discipline'"],
