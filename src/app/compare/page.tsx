@@ -494,6 +494,12 @@ export default function ComparePage() {
               const compat = getCompatScore(analysisA.archetype, analysisB.archetype);
               const compareUrl = `${window.location.origin}/compare?a=${addrA}&b=${addrB}&network=${networkA}`;
               const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${compareUrl}\n#MantleDNA #Mantle`;
+              const ogCompareUrl = `/api/og-compare?${new URLSearchParams({
+                a: addrA, b: addrB,
+                archetypeA: String(analysisA.archetype), archetypeB: String(analysisB.archetype),
+                scoreA: String(analysisA.mantleScore), scoreB: String(analysisB.mantleScore),
+                compat: String(compat), network: networkA,
+              }).toString()}`;
               return (
                 <>
                   <a
@@ -512,6 +518,13 @@ export default function ComparePage() {
                     style={{ background: "#7c3aed", border: "1px solid #6d28d9" }}
                   >
                     ⬡ Farcaster
+                  </a>
+                  <a
+                    href={ogCompareUrl}
+                    download={`mantle-dna-compare-${addrA.slice(0, 6)}-${addrB.slice(0, 6)}.png`}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-400 hover:text-gray-300 transition-colors"
+                  >
+                    ↓ Download
                   </a>
                 </>
               );
