@@ -54,6 +54,108 @@ const ARCHETYPE_RARITY: Record<number, string> = {
   6: "12% of wallets",
 };
 
+type EvolutionData = {
+  targetName: string;
+  targetEmoji: string;
+  targetColor: string;
+  progressItems: Array<{ label: string; current: number; target: number }>;
+  actions: Array<{ protocol: string; url: string; action: string }>;
+};
+
+function getEvolution(analysis: WalletAnalysis): EvolutionData {
+  const { archetype, deFiScore, holdScore, diversityScore, activityScore, txCount } = analysis;
+  switch (archetype) {
+    case 0:
+      return {
+        targetName: "Protocol Master",
+        targetEmoji: "⚡",
+        targetColor: "#f97316",
+        progressItems: [{ label: "DeFi Score (elite)", current: deFiScore, target: 1000 }],
+        actions: [
+          { protocol: "Init Capital", url: "https://init.capital", action: "Open leveraged yield positions for max DeFi score" },
+          { protocol: "Lendle", url: "https://lendle.xyz", action: "Optimize your borrow-supply efficiency" },
+        ],
+      };
+    case 1:
+      return {
+        targetName: "Yield Farmer",
+        targetEmoji: "🌾",
+        targetColor: "#22c55e",
+        progressItems: [
+          { label: "DeFi Score → 500", current: deFiScore, target: 500 },
+          { label: "Diversity → 700", current: diversityScore, target: 700 },
+        ],
+        actions: [
+          { protocol: "Agni Finance", url: "https://agni.finance", action: "Provide MNT/USDC liquidity" },
+          { protocol: "mETH Protocol", url: "https://meth.mantle.xyz", action: "Stake ETH for liquid mETH yield" },
+        ],
+      };
+    case 2:
+      return {
+        targetName: "Yield Farmer",
+        targetEmoji: "🌾",
+        targetColor: "#22c55e",
+        progressItems: [
+          { label: "DeFi Score → 500", current: deFiScore, target: 500 },
+          { label: "Diversity → 700", current: diversityScore, target: 700 },
+        ],
+        actions: [
+          { protocol: "Agni Finance", url: "https://agni.finance", action: "Add your first liquidity position" },
+          { protocol: "Merchant Moe", url: "https://merchantmoe.com", action: "Trade to boost activity score" },
+        ],
+      };
+    case 3:
+      return {
+        targetName: "DeFi Degen",
+        targetEmoji: "🔥",
+        targetColor: "#f97316",
+        progressItems: [{ label: "DeFi Score → 800", current: deFiScore, target: 800 }],
+        actions: [
+          { protocol: "Init Capital", url: "https://init.capital", action: "Open leveraged yield position" },
+          { protocol: "Agni Finance", url: "https://agni.finance", action: "Add concentrated liquidity range" },
+        ],
+      };
+    case 4:
+      return {
+        targetName: "Trader",
+        targetEmoji: "📊",
+        targetColor: "#eab308",
+        progressItems: [
+          { label: "Transactions → 5", current: txCount, target: 5 },
+          { label: "Activity → 750", current: activityScore, target: 750 },
+        ],
+        actions: [
+          { protocol: "Mantle Bridge", url: "https://bridge.mantle.xyz", action: "Bridge ETH or USDC to Mantle" },
+          { protocol: "Agni Finance", url: "https://agni.finance", action: "Make your first on-chain swap" },
+        ],
+      };
+    case 5:
+      return {
+        targetName: "Yield Farmer",
+        targetEmoji: "🌾",
+        targetColor: "#22c55e",
+        progressItems: [{ label: "Protocol Diversity → 700", current: diversityScore, target: 700 }],
+        actions: [
+          { protocol: "Init Capital", url: "https://init.capital", action: "Deploy capital for leveraged yield" },
+          { protocol: "Lendle", url: "https://lendle.xyz", action: "Supply MNT to earn passive yield" },
+        ],
+      };
+    case 6:
+      return {
+        targetName: "Diamond Hands",
+        targetEmoji: "💎",
+        targetColor: "#06b6d4",
+        progressItems: [{ label: "HODLing Score → 800", current: holdScore, target: 800 }],
+        actions: [
+          { protocol: "mETH Protocol", url: "https://meth.mantle.xyz", action: "Stake ETH for long-term mETH yield" },
+          { protocol: "Lendle", url: "https://lendle.xyz", action: "Supply assets for passive income" },
+        ],
+      };
+    default:
+      return { targetName: "Elite", targetEmoji: "⚡", targetColor: "#10b981", progressItems: [], actions: [] };
+  }
+}
+
 export function DNACard({ analysis }: Props) {
   const [addrCopied, setAddrCopied] = useState(false);
   const { writeContract, data: hash, isPending } = useWriteContract();
@@ -241,6 +343,42 @@ export function DNACard({ analysis }: Props) {
         );
       })()}
 
+      {/* Mantle Ecosystem Score */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-400 font-medium uppercase tracking-wider">Mantle Ecosystem Score</span>
+          <span className="font-bold text-sm" style={{ color: accentColor }}>{analysis.mantleScore}/100</span>
+        </div>
+        <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${analysis.mantleScore}%`,
+              background: `linear-gradient(90deg, ${accentColor}aa, ${accentColor})`,
+              boxShadow: `0 0 8px ${accentColor}60`,
+            }}
+          />
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {[
+            analysis.mantleScore >= 20 && { label: "MNT Holder" },
+            parseFloat(analysis.mntBalance) >= 1 && { label: "MNT Whale" },
+            analysis.tokenBalances?.mETH && { label: "mETH Staker" },
+            (analysis.tokenBalances?.USDT || analysis.tokenBalances?.USDC) && { label: "Stable User" },
+            analysis.tokenBalances?.WMNT && { label: "DeFi Active" },
+            analysis.txCount > 5 && { label: "On-chain Veteran" },
+          ].filter(Boolean).map((badge) => (
+            <span
+              key={(badge as { label: string }).label}
+              className="text-[10px] px-1.5 py-0.5 rounded-full"
+              style={{ background: `${accentColor}15`, color: `${accentColor}cc`, border: `1px solid ${accentColor}30` }}
+            >
+              ✓ {(badge as { label: string }).label}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Fresh wallet note */}
       {analysis.archetype === 4 && analysis.txCount < 5 && parseFloat(analysis.mntBalance) < 0.001 && (
         <div className="px-3 py-2.5 rounded-xl text-xs text-gray-500 leading-relaxed space-y-1"
@@ -318,6 +456,71 @@ export function DNACard({ analysis }: Props) {
           )}
         </div>
       )}
+
+      {/* DNA Evolution Path */}
+      {(() => {
+        const evo = getEvolution(analysis);
+        return (
+          <div
+            className="p-4 rounded-xl space-y-3"
+            style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">DNA Evolution Path</span>
+              <span className="text-[10px] text-gray-700">Mantle Protocol Actions</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-1.5 text-gray-400">
+                <span>{analysis.archetypeEmoji}</span>
+                <span className="text-xs">{analysis.archetypeName}</span>
+              </div>
+              <span className="text-gray-700">→</span>
+              <div className="flex items-center gap-1.5 font-semibold text-xs" style={{ color: evo.targetColor }}>
+                <span>{evo.targetEmoji}</span>
+                <span>{evo.targetName}</span>
+              </div>
+            </div>
+            {evo.progressItems.map((item) => {
+              const pct = Math.min(100, Math.round((item.current / item.target) * 100));
+              return (
+                <div key={item.label} className="space-y-1">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-gray-600">{item.label}</span>
+                    <span className="font-mono" style={{ color: evo.targetColor }}>{item.current}/{item.target}</span>
+                  </div>
+                  <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${pct}%`,
+                        background: evo.targetColor,
+                        boxShadow: `0 0 4px ${evo.targetColor}60`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <div className="grid grid-cols-2 gap-2">
+              {evo.actions.map((action) => (
+                <a
+                  key={action.protocol}
+                  href={action.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg border border-gray-800 hover:border-gray-600 transition-all hover:scale-[1.01] group"
+                  style={{ background: "rgba(8,12,20,0.9)" }}
+                >
+                  <div className="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">
+                    {action.protocol} ↗
+                  </div>
+                  <div className="text-[10px] text-gray-600 mt-0.5 leading-tight">{action.action}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Protocol Affinity */}
       <div className="space-y-2">

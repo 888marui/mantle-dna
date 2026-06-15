@@ -165,13 +165,17 @@ export default function WalletPage({ params }: { params: { address: string } }) 
                   <div className="text-xs text-gray-500 font-mono">
                     {address.slice(0, 14)}...{address.slice(-12)}
                   </div>
-                  <div className="flex items-center justify-center gap-3 text-xs">
+                  <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
                     <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>
                       {ARCHETYPE_RARITY[analysis.archetype] ?? "Rare"}
                     </span>
                     <span className="text-gray-600">·</span>
                     <span className="text-gray-500">
                       DNA Strength {Math.round((analysis.deFiScore + analysis.holdScore + analysis.diversityScore + analysis.activityScore) / 40)}%
+                    </span>
+                    <span className="text-gray-600">·</span>
+                    <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>
+                      Mantle Score {analysis.mantleScore}/100
                     </span>
                     <span className="text-gray-600">·</span>
                     <span className="px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">

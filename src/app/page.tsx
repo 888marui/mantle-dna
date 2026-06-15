@@ -77,6 +77,7 @@ interface RecentEntry {
   archetypeName: string;
   archetypeEmoji: string;
   analyzedAt: number;
+  network: NetworkType;
 }
 
 function loadRecent(): RecentEntry[] {
@@ -95,6 +96,7 @@ function saveRecent(analysis: WalletAnalysis) {
     archetypeName: analysis.archetypeName,
     archetypeEmoji: analysis.archetypeEmoji,
     analyzedAt: analysis.analyzedAt,
+    network: analysis.network,
   };
   const prev = loadRecent().filter((r) => r.address !== entry.address);
   const next = [entry, ...prev].slice(0, 3);
@@ -303,7 +305,7 @@ export default function Home() {
             {/* Actions row */}
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a
-                href={`/wallet/${analysis.address}`}
+                href={`/wallet/${analysis.address}?network=${analysis.network}`}
                 className="text-sm text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors"
               >
                 🔗 Shareable link
@@ -331,7 +333,7 @@ export default function Home() {
                   step: "01",
                   icon: "🔍",
                   title: "Paste Your Address",
-                  desc: "Enter any Mantle wallet address. We fetch your on-chain data live from Mantle Sepolia.",
+                  desc: "Enter any wallet address. We fetch live on-chain data from Mantle Mainnet — balance, transactions, and real ERC-20 token holdings.",
                 },
                 {
                   step: "02",
@@ -446,7 +448,7 @@ export default function Home() {
               {recentAnalyses.map((r) => (
                 <button
                   key={r.address}
-                  onClick={() => handleAnalyze(r.address)}
+                  onClick={() => handleAnalyze(r.address, r.network ?? 'mainnet')}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/70 border border-gray-800 hover:border-emerald-700 text-sm transition-colors group"
                 >
                   <span className="text-base">{r.archetypeEmoji}</span>
