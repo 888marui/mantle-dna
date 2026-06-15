@@ -201,7 +201,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
-              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing · DNA Comparison with compatibility score + DNA distance metric</div>
+              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) with Bronze/Silver/Gold/Platinum tiers · Achievement badges · X + Farcaster sharing · DNA Comparison with compatibility score + DNA distance metric</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">🔗 Mantle Ecosystem (25%)</div>
