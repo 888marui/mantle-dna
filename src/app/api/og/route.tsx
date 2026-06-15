@@ -165,6 +165,7 @@ export async function GET(req: NextRequest) {
   const network = searchParams.get("network") ?? "mainnet";
   const mantleScore = Number(searchParams.get("mantleScore") ?? 0);
 
+  const isDownload = searchParams.get("download") === "1";
   const shortAddr = `${address.slice(0, 10)}...${address.slice(-8)}`;
   const totalPct = Math.round((defi + hodl + diversity + activity) / 40);
 
@@ -393,6 +394,13 @@ export async function GET(req: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1200, height: 630 }
+    {
+      width: 1200,
+      height: 630,
+      headers: isDownload ? {
+        "Content-Disposition": `attachment; filename="mantle-dna-${archetype.name.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png"`,
+        "Content-Type": "image/png",
+      } : undefined,
+    }
   );
 }

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "AI-powered wallet DNA profiler on Mantle Network. Real ERC-20 data, 7 archetypes, Mantle Ecosystem Score, DNA Evolution Path — mint as a Soulbound NFT.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
   ),
   openGraph: {
     title: "Mantle DNA — Discover Your On-Chain Identity",
@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     "Mantle Network", "Mantle DNA", "Web3 identity", "NFT", "DeFi",
     "wallet analysis", "AI", "Soulbound NFT", "on-chain personality",
     "mETH", "Agni Finance", "DNA archetype", "Mantle Ecosystem Score",
+    "wallet comparison", "DNA comparison", "on-chain identity", "Mantle Sepolia",
   ],
   icons: {
     icon: "/favicon.svg",

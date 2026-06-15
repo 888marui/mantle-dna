@@ -651,6 +651,7 @@ export function DNACard({ analysis }: Props) {
             activity: String(analysis.activityScore),
             network: analysis.network,
             mantleScore: String(analysis.mantleScore),
+            download: "1",
           }).toString()}`}
           download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${analysis.address.slice(0, 8)}.png`}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-600 text-xs font-medium transition-colors"
