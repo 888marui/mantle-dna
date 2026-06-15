@@ -340,19 +340,19 @@ export default function Home() {
                   step: "01",
                   icon: "🔍",
                   title: "Paste Your Address",
-                  desc: "Enter any wallet address. We fetch live on-chain data from Mantle Mainnet — balance, transactions, and real ERC-20 token holdings.",
+                  desc: "Enter any wallet address. We fetch live on-chain data from Mantle — balance, transactions, USDT/USDC/mETH/WMNT token holdings. Works on Mainnet and Sepolia.",
                 },
                 {
                   step: "02",
                   icon: "🧬",
-                  title: "AI Analysis",
-                  desc: "Claude AI analyzes your DeFi activity, transaction patterns, and portfolio behavior to reveal your DNA.",
+                  title: "AI Personality Analysis",
+                  desc: "Claude Haiku analyzes your DeFi score, HODL behavior, protocol diversity, and activity patterns. References real token balances and Mantle Ecosystem Score.",
                 },
                 {
                   step: "03",
                   icon: "🎭",
-                  title: "Mint Your Identity",
-                  desc: "Receive one of 7 archetypes and mint it as a soulbound NFT — your permanent on-chain identity on Mantle.",
+                  title: "Share, Compare & Mint",
+                  desc: "Mint your archetype as a Soulbound NFT. Share to 𝕏/Farcaster with a DNA Certificate. Compare with another wallet for a compatibility score.",
                 },
               ].map((item) => (
                 <div

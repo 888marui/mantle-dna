@@ -21,8 +21,9 @@ export function ShareButton({ analysis }: Props) {
     hodl: String(analysis.holdScore),
     diversity: String(analysis.diversityScore),
     activity: String(analysis.activityScore),
+    network: analysis.network,
+    mantleScore: String(analysis.mantleScore),
   });
-  if (analysis.network === 'mainnet') ogParams.set('network', 'mainnet');
   const walletUrl = `${appUrl}/wallet/${analysis.address}?${ogParams.toString()}`;
 
   const shareText = `🧬 My Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\n${walletUrl}\n#MantleDNA #Mantle #Web3`;

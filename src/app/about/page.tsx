@@ -44,6 +44,7 @@ export default function AboutPage() {
               { name: "Mantle RPC (dual-network)", role: "Live MNT balance, tx count, ERC-20 tokens (USDT/USDC/mETH/WMNT) on Mainnet & Sepolia", icon: "🔗" },
               { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK — references real token holdings and scores", icon: "🤖" },
               { name: "viem + wagmi v2", role: "Type-safe Ethereum + ERC-20 readContract, wallet connect for both chains", icon: "🔧" },
+              { name: "3× REST APIs", role: "GET /api/wallet, GET /api/compare, POST /api/batch — public, CORS-enabled, 60s cache", icon: "🌐" },
               { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards with network badge, Mantle Score, downloadable as DNA Certificates", icon: "🖼️" },
               { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI insight keccak256 hash", icon: "🎭" },
               { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with self-mint, oracle-mint, and full test coverage", icon: "⛓️" },
@@ -124,6 +125,15 @@ export default function AboutPage() {
           </p>
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+              <div className="text-emerald-400">POST /api/batch</div>
+              <div className="text-gray-600 text-[11px]">Body: {"{ \"addresses\": [\"0x...\", \"0x...\"], \"network\": \"mainnet\" }"}</div>
+              <div className="text-gray-500 text-[11px] leading-relaxed">{`{
+  "results": [{ "address": "0x...", "status": "ok", "data": { ...wallet analysis } }, ...],
+  "summary": { "total": 3, "successful": 3, "archetypeDistribution": { "Whale": 1, "Trader": 2 }, "topArchetype": {...} },
+  "analyzedAt": "2026-06-15T08:30:00.000Z"
+}`}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
               <div className="text-emerald-400">GET /api/wallet/{"{address}"}?network=mainnet</div>
               <div className="text-gray-500 text-[11px] leading-relaxed">{`{
   "address": "0x...",
@@ -182,7 +192,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">⚡ Technical Depth (30%)</div>
-              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract</div>
+              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract · 3× public REST APIs (wallet, compare, batch) with CORS + caching</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>

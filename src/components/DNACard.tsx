@@ -21,6 +21,27 @@ const PROTOCOL_URLS: Record<string, string> = {
   "Mantle Bridge": "https://bridge.mantle.xyz",
 };
 
+// Protocol match score based on wallet's DNA traits (0-100)
+function protocolMatchScore(
+  protocol: string,
+  deFi: number,
+  hold: number,
+  diversity: number,
+  activity: number
+): number {
+  const scores: Record<string, number> = {
+    "Agni Finance": Math.round((deFi * 0.5 + activity * 0.3 + diversity * 0.2) / 10),
+    "Merchant Moe": Math.round((activity * 0.6 + deFi * 0.3 + diversity * 0.1) / 10),
+    "Init Capital": Math.round((deFi * 0.4 + diversity * 0.4 + hold * 0.2) / 10),
+    "mETH Protocol": Math.round((hold * 0.6 + deFi * 0.2 + diversity * 0.2) / 10),
+    "Lendle": Math.round((hold * 0.4 + deFi * 0.4 + diversity * 0.2) / 10),
+    "FBTC": Math.round((hold * 0.7 + diversity * 0.2 + deFi * 0.1) / 10),
+    "Mantle NFT Market": Math.round((diversity * 0.5 + activity * 0.3 + hold * 0.2) / 10),
+    "Mantle Bridge": Math.round((activity * 0.5 + diversity * 0.3 + deFi * 0.2) / 10),
+  };
+  return Math.min(100, scores[protocol] ?? 50);
+}
+
 interface Props {
   analysis: WalletAnalysis;
   onMintDNA: () => void;
@@ -524,24 +545,37 @@ export function DNACard({ analysis }: Props) {
 
       {/* Protocol Affinity */}
       <div className="space-y-2">
-        <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Ecosystem Affinity</div>
-        <div className="flex flex-wrap gap-2">
-          {analysis.protocolAffinity.map((protocol) => (
-            <a
-              key={protocol}
-              href={PROTOCOL_URLS[protocol] ?? "https://mantle.xyz/ecosystem"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105"
-              style={{
-                background: `${accentColor}15`,
-                border: `1px solid ${accentColor}35`,
-                color: "#9ca3af",
-              }}
-            >
-              {protocol} ↗
-            </a>
-          ))}
+        <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Protocol Match</div>
+        <div className="space-y-1.5">
+          {analysis.protocolAffinity.map((protocol) => {
+            const match = protocolMatchScore(protocol, analysis.deFiScore, analysis.holdScore, analysis.diversityScore, analysis.activityScore);
+            return (
+              <a
+                key={protocol}
+                href={PROTOCOL_URLS[protocol] ?? "https://mantle.xyz/ecosystem"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 group"
+              >
+                <div className="text-xs text-gray-500 w-28 shrink-0 group-hover:text-gray-300 transition-colors truncate">
+                  {protocol}
+                </div>
+                <div className="flex-1 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${match}%`,
+                      background: `linear-gradient(90deg, ${accentColor}80, ${accentColor})`,
+                    }}
+                  />
+                </div>
+                <div className="text-[10px] font-mono w-8 text-right shrink-0" style={{ color: accentColor }}>
+                  {match}%
+                </div>
+                <span className="text-[10px] text-gray-700 group-hover:text-gray-500 transition-colors">↗</span>
+              </a>
+            );
+          })}
         </div>
       </div>
 
