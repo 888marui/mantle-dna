@@ -103,13 +103,29 @@ export async function GET(req: NextRequest, { params }: { params: { address: str
       : seed(4) % 1000;
 
     let archetype: number;
-    if (mntBalance > 100) archetype = 5;
-    else if (txCount_ < 5) archetype = 4;
-    else if (deFiScore > 800) archetype = 0;
-    else if (holdScore > 800) archetype = 1;
-    else if (diversityScore > 700 && deFiScore > 500) archetype = 3;
-    else if (activityScore > 750) archetype = 6;
-    else archetype = 2;
+    let archetypeReason: string;
+    if (mntBalance > 100) {
+      archetype = 5;
+      archetypeReason = `MNT balance ${mntBalance.toFixed(2)} > 100 MNT threshold → Whale classification`;
+    } else if (txCount_ < 5) {
+      archetype = 4;
+      archetypeReason = `Transaction count ${txCount_} < 5 → Newcomer (early-stage wallet)`;
+    } else if (deFiScore > 800) {
+      archetype = 0;
+      archetypeReason = `DeFi score ${deFiScore}/1000 exceeds 800 threshold → DeFi Degen`;
+    } else if (holdScore > 800) {
+      archetype = 1;
+      archetypeReason = `HODLing score ${holdScore}/1000 exceeds 800 threshold → Diamond Hands`;
+    } else if (diversityScore > 700 && deFiScore > 500) {
+      archetype = 3;
+      archetypeReason = `Protocol diversity ${diversityScore}/1000 > 700 + DeFi ${deFiScore}/1000 > 500 → Yield Farmer`;
+    } else if (activityScore > 750) {
+      archetype = 6;
+      archetypeReason = `Activity score ${activityScore}/1000 exceeds 750 threshold → Trader`;
+    } else {
+      archetype = 2;
+      archetypeReason = `Balanced profile: DeFi ${deFiScore}, HODLing ${holdScore}, Diversity ${diversityScore} → NFT Collector`;
+    }
 
     // Mantle Ecosystem Score
     let mantleScore = 0;
@@ -132,6 +148,7 @@ export async function GET(req: NextRequest, { params }: { params: { address: str
       archetype,
       archetypeName: ARCHETYPE_NAMES[archetype],
       archetypeEmoji: ARCHETYPE_EMOJIS[archetype],
+      archetypeReason,
       scores: {
         deFiScore,
         holdScore,

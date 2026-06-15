@@ -290,18 +290,22 @@ export default function ComparePage() {
   const [errorB, setErrorB] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const analyzeA = useCallback(async () => {
-    if (!isAddress(addrA)) return;
+  const analyzeA = useCallback(async (addr?: string, net?: NetworkType) => {
+    const a = addr ?? addrA;
+    const n = net ?? networkA;
+    if (!isAddress(a)) return;
     setLoadingA(true); setErrorA(null); setAnalysisA(null);
-    try { setAnalysisA(await analyzeWallet(addrA, networkA)); }
+    try { setAnalysisA(await analyzeWallet(a, n)); }
     catch { setErrorA("Failed to analyze wallet A"); }
     finally { setLoadingA(false); }
   }, [addrA, networkA]);
 
-  const analyzeB = useCallback(async () => {
-    if (!isAddress(addrB)) return;
+  const analyzeB = useCallback(async (addr?: string, net?: NetworkType) => {
+    const b = addr ?? addrB;
+    const n = net ?? networkB;
+    if (!isAddress(b)) return;
     setLoadingB(true); setErrorB(null); setAnalysisB(null);
-    try { setAnalysisB(await analyzeWallet(addrB, networkB)); }
+    try { setAnalysisB(await analyzeWallet(b, n)); }
     catch { setErrorB("Failed to analyze wallet B"); }
     finally { setLoadingB(false); }
   }, [addrB, networkB]);
@@ -409,6 +413,8 @@ export default function ComparePage() {
                     setAddrB(ex.b);
                     setNetworkA("mainnet");
                     setNetworkB("mainnet");
+                    analyzeA(ex.a, "mainnet");
+                    analyzeB(ex.b, "mainnet");
                   }}
                   className="px-3 py-1.5 rounded-full text-xs border border-gray-700 text-gray-400 hover:border-emerald-700 hover:text-emerald-400 transition-colors"
                 >
