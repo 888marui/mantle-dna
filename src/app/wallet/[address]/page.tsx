@@ -6,10 +6,9 @@ import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { WalletButton } from "@/components/WalletButton";
 import Link from "next/link";
-import { use } from "react";
 
-export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
-  const { address } = use(params);
+export default function WalletPage({ params }: { params: { address: string } }) {
+  const { address } = params;
   const [analysis, setAnalysis] = useState<WalletAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

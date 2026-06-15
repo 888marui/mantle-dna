@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ address: string }>;
+  params: { address: string };
 }): Promise<Metadata> {
-  const { address } = await params;
+  const { address } = params;
   const short = `${address.slice(0, 10)}...${address.slice(-8)}`;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mantle-dna.vercel.app";
   const ogUrl = `${appUrl}/api/og?address=${address}`;
