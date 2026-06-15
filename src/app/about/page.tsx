@@ -126,7 +126,7 @@ export default function AboutPage() {
           </p>
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
-              <div className="text-emerald-400">GET /api/health</div>
+              <a href="/api/health" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors">GET /api/health ↗</a>
               <div className="text-gray-500 text-[11px] leading-relaxed">{`{ "status": "ok", "service": "Mantle DNA API", "endpoints": { ... }, "networks": ["mainnet", "sepolia"] }`}</div>
             </div>
             <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
