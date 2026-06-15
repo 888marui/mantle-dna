@@ -26,10 +26,10 @@ interface Props {
 }
 
 const SCORE_LABELS: Record<string, string> = {
-  deFiScore: "DeFi",
+  deFiScore: "DeFi Engagement",
   holdScore: "HODLing",
-  diversityScore: "Diversity",
-  activityScore: "Activity",
+  diversityScore: "Protocol Diversity",
+  activityScore: "On-chain Activity",
 };
 
 /** Primary accent color per archetype index */
@@ -411,14 +411,33 @@ function StatBadge({ label, value, accentColor }: { label: string; value: string
   );
 }
 
+function scoreTier(v: number): string {
+  if (v >= 800) return "Elite";
+  if (v >= 600) return "Strong";
+  if (v >= 400) return "Moderate";
+  return "Growing";
+}
+
 function ScoreBar({ label, value, accentColor }: { label: string; value: number; accentColor: string }) {
   const pct = Math.round(value / 10);
+  const tier = scoreTier(value);
 
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-xs">
+      <div className="flex justify-between items-center text-xs">
         <span className="text-gray-400">{label}</span>
-        <span className="text-gray-300">{value}/1000</span>
+        <div className="flex items-center gap-2">
+          <span
+            className="text-[10px] px-1.5 py-0.5 rounded-full"
+            style={{
+              background: value >= 800 ? `${accentColor}25` : "rgba(31,41,55,0.6)",
+              color: value >= 800 ? accentColor : "#6b7280",
+            }}
+          >
+            {tier}
+          </span>
+          <span className="text-gray-500">{value}</span>
+        </div>
       </div>
       <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
         <div
