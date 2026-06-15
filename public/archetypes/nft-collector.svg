@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bg-nft" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </radialGradient>
+    <linearGradient id="frame-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <radialGradient id="canvas-grad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#2d1254"/>
+      <stop offset="100%" stop-color="#1a0a2e"/>
+    </radialGradient>
+    <filter id="glow-filter-nft">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="glow-purple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="16" fill="url(#bg-nft)"/>
+
+  <!-- Glow aura -->
+  <ellipse cx="100" cy="95" rx="72" ry="72" fill="url(#glow-purple)"/>
+
+  <!-- Picture frame outer -->
+  <rect x="38" y="38" width="124" height="110" rx="6" fill="url(#frame-grad)" filter="url(#glow-filter-nft)"/>
+  <!-- Picture frame inner (canvas) -->
+  <rect x="50" y="50" width="100" height="86" rx="3" fill="url(#canvas-grad)"/>
+
+  <!-- Abstract art inside canvas -->
+  <g opacity="0.85">
+    <!-- Background wash -->
+    <rect x="52" y="52" width="96" height="82" rx="2" fill="#1e0a3c"/>
+    <!-- Color blocks — abstract NFT style -->
+    <rect x="55" y="55" width="40" height="36" rx="1" fill="#7c3aed" opacity="0.7"/>
+    <rect x="105" y="55" width="40" height="36" rx="1" fill="#db2777" opacity="0.7"/>
+    <rect x="55" y="98" width="40" height="32" rx="1" fill="#ec4899" opacity="0.6"/>
+    <rect x="105" y="98" width="40" height="32" rx="1" fill="#9333ea" opacity="0.6"/>
+    <!-- Center star burst -->
+    <g filter="url(#glow-filter-nft)">
+      <polygon points="100,66 103,79 116,79 106,87 110,100 100,92 90,100 94,87 84,79 97,79" fill="#fde68a" opacity="0.95"/>
+    </g>
+  </g>
+
+  <!-- Frame corner ornaments -->
+  <g fill="#ec4899" opacity="0.7">
+    <circle cx="50" cy="50" r="4"/>
+    <circle cx="150" cy="50" r="4"/>
+    <circle cx="50" cy="148" r="4"/>
+    <circle cx="150" cy="148" r="4"/>
+  </g>
+
+  <!-- Hanging hook -->
+  <rect x="95" y="30" width="10" height="10" rx="2" fill="#a855f7" opacity="0.8"/>
+  <line x1="100" y1="38" x2="100" y2="50" stroke="#a855f7" stroke-width="2" opacity="0.8"/>
+
+  <!-- Sparkles outside -->
+  <g fill="#f0abfc" filter="url(#glow-filter-nft)">
+    <path d="M26,60 L27.5,55 L29,60 L34,61.5 L29,63 L27.5,68 L26,63 L21,61.5 Z" opacity="0.8"/>
+    <path d="M168,130 L169.5,125 L171,130 L176,131.5 L171,133 L169.5,138 L168,133 L163,131.5 Z" opacity="0.7"/>
+  </g>
+
+  <!-- Archetype name -->
+  <text x="100" y="186" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#a855f7" letter-spacing="1">NFT Collector</text>
+</svg>

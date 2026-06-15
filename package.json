@@ -1,21 +1,32 @@
 {
   "name": "mantle-dna",
   "version": "1.0.0",
-  "description": "Decentralized Genomic Data Ownership Platform on Mantle Network",
-  "scripts": {
-    "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy:testnet": "hardhat run scripts/deploy.js --network mantleTestnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.js --network mantle",
-    "verify": "hardhat verify --network mantleTestnet",
-    "coverage": "hardhat coverage"
+  "private": true,
+  "engines": {
+    "node": ">=20"
   },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.19.0"
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.0",
-    "dotenv": "^16.3.1"
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "wagmi": "^2.9.4",
+    "@anthropic-ai/sdk": "^0.27.3",
+    "@tanstack/react-query": "^5.36.0",
+    "viem": "^2.13.3"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8",
+    "autoprefixer": "^10.0.1"
   }
 }

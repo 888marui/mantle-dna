@@ -1,163 +1,227 @@
 # 🧬 Mantle DNA
 
-**Decentralized Genomic Data Ownership Platform on Mantle Network**
+**Discover your on-chain identity. Mint it forever.**
 
-## Overview
+Mantle DNA analyzes any Mantle wallet address and generates a unique personality profile — powered by Claude AI — then mints it as a Soulbound NFT on Mantle Network.
 
-Mantle DNA is a decentralized platform that enables individuals to store, manage, and selectively share their genomic data on the Mantle blockchain. By leveraging Mantle's low-cost L2 infrastructure, we make on-chain genomic data management accessible and affordable for everyone.
+🔗 **Live Demo:** https://mantle-dna-git-claude-kind-t-8894e8-888marui-gmailcoms-projects.vercel.app
 
-## Problem
+---
 
-- Genetic data is stored in centralized databases controlled by corporations
-- Users have no true ownership or control over their most personal data
-- Sharing genomic data for research requires trusting intermediaries
-- High gas fees on L1 make on-chain genomic data impractical
+## What It Does
 
-## Solution
+Paste any Mantle wallet address and instantly receive:
 
-Mantle DNA provides:
+- **Archetype** — one of 7 on-chain personality types derived from wallet behavior
+- **DNA Scores** — DeFi, HODLing, Diversity, and Activity scores (0–1000 each)
+- **AI Insight** — Claude AI generates a personalized analysis of your Web3 personality
+- **Soulbound NFT** — mint your DNA as a non-transferable ERC-721 token on Mantle Sepolia
 
-1. **Self-Sovereign Identity**: Your DNA profile is an NFT you truly own
-2. **Privacy-Preserving Sharing**: Share encrypted data hashes, not raw sequences
-3. **Consent Management**: Grant/revoke access to researchers on-chain
-4. **Incentivized Research**: Earn tokens when your anonymized data contributes to approved research
-5. **Low Cost**: Mantle's L2 makes transactions 10-100x cheaper than Ethereum L1
+### 7 Archetypes
+
+| Archetype | Description |
+|---|---|
+| 🔥 DeFi Degen | High-frequency swaps, yield chasing, protocol hopping |
+| 💎 Diamond Hands | Long-term holder, low churn, conviction buyer |
+| 🎨 NFT Collector | Digital art and collectibles focused |
+| 🌾 Yield Farmer | Liquidity provision and passive yield strategies |
+| 🌱 Newcomer | Fresh wallet, beginning the Mantle journey |
+| 🐋 Whale | High-value transactions, strategic market mover |
+| 📊 Trader | Active DEX user, sharp execution timing |
+
+---
+
+## AI × On-Chain Integration
+
+Mantle DNA uses **Claude Haiku** (via the Anthropic API) to generate personalized wallet insights from on-chain data:
+
+```
+Wallet on-chain data → Claude AI → JSON insight
+{
+  "insight": "2-sentence personality analysis",
+  "strengths": ["trait 1", "trait 2", "trait 3"],
+  "watchOut": "specific risk for this archetype",
+  "prediction": "DeFi future prediction on Mantle"
+}
+```
+
+The AI insight text is hashed (`keccak256`) and stored **permanently on-chain** in the `DNATraits` struct, creating a verifiable link between the AI output and the NFT.
+
+---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                │
-│          MetaMask / Mantle Wallet Integration        │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│              Smart Contracts (Mantle)                │
-│  ┌─────────────────┐  ┌──────────────────────────┐  │
-│  │  DNAProfile.sol │  │  ConsentManager.sol       │  │
-│  │  (ERC-721 NFT)  │  │  (Access Control)         │  │
-│  └─────────────────┘  └──────────────────────────┘  │
-│  ┌────────────────────────────────────────────────┐  │
-│  │         DNAToken.sol (ERC-20 Rewards)          │  │
-│  └────────────────────────────────────────────────┘  │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│              Off-chain Storage (IPFS)                │
-│         Encrypted genomic data stored off-chain      │
-│         Only hashes stored on Mantle blockchain      │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│            Frontend (Next.js 14)              │
+│  SearchBar → analyzeWallet() → DNACard       │
+│  + DNAVisualizer (SVG double helix)           │
+└──────────┬───────────────────────────────────┘
+           │
+┌──────────▼───────────────────────────────────┐
+│       analyzer.ts (wallet analysis)           │
+│  1. Fetch balance + block from Mantle RPC     │
+│  2. Derive DNA traits from address bytes      │
+│  3. POST /api/analyze → Claude Haiku AI       │
+└──────────┬─────────────┬────────────────────-┘
+           │             │
+┌──────────▼──────┐  ┌───▼─────────────────────┐
+│  Mantle RPC     │  │  Anthropic API           │
+│  (viem client)  │  │  claude-haiku-4-5        │
+└─────────────────┘  └──────────────────────────┘
+           │
+┌──────────▼───────────────────────────────────┐
+│       WalletDNA.sol (Mantle Sepolia)          │
+│  ERC-721 Soulbound — stores DNA on-chain     │
+│  aiInsightHash links AI output to NFT        │
+└──────────────────────────────────────────────┘
 ```
+
+---
+
+## Smart Contract
+
+**Network:** Mantle Sepolia Testnet (Chain ID: 5003)
+
+**Contract:** `blockchain/contracts/WalletDNA.sol` — ERC-721 Soulbound NFT
+
+Key features:
+- **Soulbound**: transfers are permanently blocked (`_beforeTokenTransfer` reverts on non-mint)
+- **DNATraits** struct stored on-chain: archetype, 4 scores, tx count, AI insight hash
+- **One NFT per wallet**: each address can only mint once
+- **Authorized minting**: only the `analyzer` oracle address can call `mintDNA`
+
+```solidity
+struct DNATraits {
+    Archetype archetype;    // 7 personality types (enum)
+    uint16 txCount;         // Transaction count on Mantle
+    uint16 deFiScore;       // 0-1000: DeFi engagement
+    uint16 holdScore;       // 0-1000: HODLing tendency
+    uint16 diversityScore;  // 0-1000: Protocol diversity
+    uint16 activityScore;   // 0-1000: Recent activity
+    uint32 firstSeenBlock;  // First activity block
+    uint32 analyzedAt;      // Unix timestamp of analysis
+    bytes32 aiInsightHash;  // keccak256 of Claude AI insight text
+}
+```
+
+---
 
 ## Tech Stack
 
-- **Blockchain**: Mantle Network (L2)
-- **Smart Contracts**: Solidity + Hardhat
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Web3**: ethers.js, wagmi, ConnectKit
-- **Storage**: IPFS (via Pinata)
-- **Testing**: Hardhat + Chai
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| Web3 | wagmi v2, viem, injected wallet connector |
+| AI | Claude Haiku (`claude-haiku-4-5-20251001`) via Anthropic SDK |
+| Contract | Solidity 0.8.20, OpenZeppelin ERC-721, Hardhat |
+| Network | Mantle Sepolia Testnet (RPC: `https://rpc.sepolia.mantle.xyz`) |
+| Deployment | Vercel (frontend) |
 
-## Getting Started
+---
+
+## Running Locally
 
 ### Prerequisites
+- Node.js 20+
+- MetaMask with Mantle Sepolia network added
+- Anthropic API key
 
-- Node.js 18+
-- npm or yarn
-- MetaMask with Mantle Network configured
-
-### Installation
+### Frontend
 
 ```bash
-git clone https://github.com/888marui/mantle-dna.git
+git clone https://github.com/888marui/mantle-dna
 cd mantle-dna
 npm install
-```
 
-### Configure Environment
+# Create .env.local with:
+# ANTHROPIC_API_KEY=your_key_here
 
-```bash
-cp .env.example .env
-# Fill in your values:
-# PRIVATE_KEY=your_wallet_private_key
-# MANTLE_RPC_URL=https://rpc.mantle.xyz
-# PINATA_API_KEY=your_pinata_key
-# PINATA_SECRET_KEY=your_pinata_secret
-```
-
-### Deploy Contracts
-
-```bash
-# Deploy to Mantle Testnet (Sepolia)
-npm run deploy:testnet
-
-# Deploy to Mantle Mainnet
-npm run deploy:mainnet
-```
-
-### Run Frontend
-
-```bash
-cd frontend
-npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open http://localhost:3000
 
-## Smart Contracts
+### Smart Contract
 
-| Contract | Description | Address (Testnet) |
-|----------|-------------|-------------------|
-| DNAProfile | NFT representing a user's DNA profile | `0x...` |
-| ConsentManager | Manages data sharing permissions | `0x...` |
-| DNAToken | ERC-20 reward token for data contributors | `0x...` |
+```bash
+cd blockchain
+npm install
 
-## Mantle Network Configuration
+# Create .env with:
+# PRIVATE_KEY=your_wallet_private_key
+# MANTLE_TESTNET_RPC=https://rpc.sepolia.mantle.xyz
 
-```
-Network Name: Mantle Mainnet
-RPC URL: https://rpc.mantle.xyz
-Chain ID: 5000
-Currency Symbol: MNT
-Block Explorer: https://explorer.mantle.xyz
+npx hardhat test
+npx hardhat run scripts/deploy.js --network mantle_testnet
 ```
 
+### Environment Variables
+
+| Variable | Description |
+|---|---|
+| `ANTHROPIC_API_KEY` | Claude AI API key — required for AI insights |
+| `NEXT_PUBLIC_MANTLE_RPC` | Mantle RPC URL (defaults to Sepolia testnet) |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Deployed WalletDNA contract address |
+
+---
+
+## Project Structure
+
 ```
-Network Name: Mantle Sepolia Testnet
-RPC URL: https://rpc.sepolia.mantle.xyz
-Chain ID: 5003
-Currency Symbol: MNT
-Block Explorer: https://explorer.sepolia.mantle.xyz
+mantle-dna/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Main app page
+│   │   ├── api/analyze/route.ts  # Claude AI API endpoint
+│   │   └── providers.tsx         # wagmi + React Query providers
+│   ├── components/
+│   │   ├── DNACard.tsx           # Archetype result card with AI insights
+│   │   ├── DNAVisualizer.tsx     # SVG animated double helix
+│   │   ├── SearchBar.tsx         # Wallet address input with validation
+│   │   ├── WalletButton.tsx      # MetaMask connect button
+│   │   └── ShareButton.tsx       # Share result on X
+│   └── lib/
+│       ├── analyzer.ts           # Wallet analysis + AI integration
+│       ├── chains.ts             # Mantle chain definitions (viem)
+│       ├── contracts.ts          # WalletDNA ABI
+│       └── wagmi.ts              # wagmi config
+├── blockchain/
+│   ├── contracts/WalletDNA.sol   # Soulbound ERC-721 contract
+│   ├── scripts/deploy.js         # Hardhat deployment script
+│   └── test/WalletDNA.test.js    # Contract test suite
+└── public/
+    └── archetypes/               # Archetype character art (PNG)
 ```
 
-## How It Works
+---
 
-1. **Upload**: User uploads their DNA data file (from 23andMe, AncestryDNA, etc.)
-2. **Encrypt**: Data is encrypted client-side with user's private key
-3. **Store**: Encrypted data is stored on IPFS, hash is stored on Mantle
-4. **Mint**: A DNAProfile NFT is minted to the user's wallet
-5. **Share**: User can grant/revoke access to specific researchers or institutions
-6. **Earn**: When anonymized data is used in approved research, user earns DNAToken rewards
+## Mantle Network
 
-## Use Cases
+```
+Testnet: Mantle Sepolia Testnet
+RPC:     https://rpc.sepolia.mantle.xyz
+ChainID: 5003
+Explorer: https://explorer.sepolia.mantle.xyz
 
-- **Genetic Research**: Opt-in participation in academic studies
-- **Personal Health**: Securely share genetic risks with healthcare providers
-- **Ancestry**: Collaborative family tree building without data loss
-- **Insurance**: Prove genetic conditions without revealing full profile
+Mainnet: Mantle
+RPC:     https://rpc.mantle.xyz
+ChainID: 5000
+Explorer: https://explorer.mantle.xyz
+```
 
-## Why Mantle?
+---
 
-- **Low Gas Fees**: DNA data operations cost cents, not dollars
-- **EVM Compatible**: Full Solidity support, easy migration from Ethereum
-- **Fast Finality**: Near-instant transaction confirmation
-- **Data Availability**: Mantle DA ensures data is always accessible
-- **Growing Ecosystem**: Active DeFi and NFT community
+## Hackathon
 
-## Team
+**Mantle Network Turing Test Hackathon 2026**
 
-Built for the Mantle Hackathon 2025
+Built for:
+- **Grand Champion** — AI × on-chain integration as an identity primitive
+- **Best UI/UX** — Dark DNA aesthetic with helix visualizer and AI-powered cards
+- **20 Project Deployment Award** — Contract on Mantle Sepolia + Claude AI on-chain function + public frontend
+
+---
 
 ## License
 
