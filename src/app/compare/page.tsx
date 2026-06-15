@@ -481,7 +481,7 @@ export default function ComparePage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
-                const url = `${window.location.origin}/compare?a=${addrA}&b=${addrB}`;
+                const url = `${window.location.origin}/compare?a=${addrA}&b=${addrB}&network=${networkA}`;
                 navigator.clipboard.writeText(url).catch(() => {});
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
@@ -492,7 +492,7 @@ export default function ComparePage() {
             </button>
             {analysisA && analysisB && (() => {
               const compat = getCompatScore(analysisA.archetype, analysisB.archetype);
-              const compareUrl = `${window.location.origin}/compare?a=${addrA}&b=${addrB}`;
+              const compareUrl = `${window.location.origin}/compare?a=${addrA}&b=${addrB}&network=${networkA}`;
               const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${compareUrl}\n#MantleDNA #Mantle`;
               return (
                 <>
