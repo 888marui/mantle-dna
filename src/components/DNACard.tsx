@@ -4,9 +4,21 @@ import { type WalletAnalysis } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
 
-const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
 import { keccak256, toBytes } from "viem";
 import { ShareButton } from "@/components/ShareButton";
+
+const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
+
+const PROTOCOL_URLS: Record<string, string> = {
+  "Agni Finance": "https://agni.finance",
+  "Merchant Moe": "https://merchantmoe.com",
+  "Init Capital": "https://init.capital",
+  "mETH Protocol": "https://meth.mantle.xyz",
+  "Lendle": "https://lendle.xyz",
+  "FBTC": "https://fbtc.io",
+  "Mantle NFT Market": "https://mantle.xyz/ecosystem",
+  "Mantle Bridge": "https://bridge.mantle.xyz",
+};
 
 interface Props {
   analysis: WalletAnalysis;
@@ -230,17 +242,20 @@ export function DNACard({ analysis }: Props) {
         <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Ecosystem Affinity</div>
         <div className="flex flex-wrap gap-2">
           {analysis.protocolAffinity.map((protocol) => (
-            <span
+            <a
               key={protocol}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium"
+              href={PROTOCOL_URLS[protocol] ?? "https://mantle.xyz/ecosystem"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105"
               style={{
                 background: `${accentColor}15`,
                 border: `1px solid ${accentColor}35`,
                 color: "#9ca3af",
               }}
             >
-              {protocol}
-            </span>
+              {protocol} ↗
+            </a>
           ))}
         </div>
       </div>
