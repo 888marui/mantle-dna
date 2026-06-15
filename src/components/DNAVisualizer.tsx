@@ -181,14 +181,14 @@ function generateStrands(analysis: WalletAnalysis, colors: string[]): Strand[] {
 
 function generateDNACode(address: string): string {
   const hex = address.toLowerCase().replace("0x", "");
-  // Interleave with complementary bases to look like a DNA sequence
-  const bases = "ATCGATCGATCGATCG";
+  const bases = ["A", "T", "C", "G"];
   let code = "";
   for (let i = 0; i < 32; i++) {
-    code += hex[i % hex.length];
+    const nibble = parseInt(hex[i % hex.length], 16);
+    code += bases[nibble % 4];
     if ((i + 1) % 8 === 0 && i < 31) code += " ";
   }
-  return code.toUpperCase();
+  return code;
 }
 
 function RadarChart({ analysis, accentColor }: { analysis: WalletAnalysis; accentColor: string }) {

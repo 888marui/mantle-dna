@@ -75,6 +75,7 @@ export default function Home() {
   const [recentAnalyses, setRecentAnalyses] = useState<RecentEntry[]>([]);
   const [statsMounted, setStatsMounted] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
+  const [blockNumber, setBlockNumber] = useState<number | null>(null);
 
   const LOADING_STAGES = [
     "Fetching on-chain data...",
@@ -84,8 +85,15 @@ export default function Home() {
 
   useEffect(() => {
     setRecentAnalyses(loadRecent());
-    // Trigger stats pulse after a brief delay
     const t = setTimeout(() => setStatsMounted(true), 300);
+    fetch(process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "eth_blockNumber", params: [], id: 1 }),
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.result) setBlockNumber(parseInt(d.result, 16)); })
+      .catch(() => {});
     return () => clearTimeout(t);
   }, []);
 
@@ -136,6 +144,12 @@ export default function Home() {
               </span>
             </div>
           </div>
+          {blockNumber && (
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Block #{blockNumber.toLocaleString()}
+            </div>
+          )}
           <WalletButton />
         </div>
       </header>
