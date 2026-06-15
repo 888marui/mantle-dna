@@ -175,6 +175,14 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     // AI enrichment failed — continue without it
   }
 
+  // Fallback: if no AI insight loaded, generate a deterministic one from traits
+  if (!analysis.aiInsight) {
+    analysis.aiInsight = generateFallbackInsight(traits, archetype.name);
+    analysis.aiStrengths = generateFallbackStrengths(traits);
+    analysis.aiWatchOut = generateFallbackWatchOut(traits.archetype);
+    analysis.aiPrediction = generateFallbackPrediction(traits.archetype, traits.deFiScore);
+  }
+
   return analysis;
 }
 
@@ -219,4 +227,61 @@ function computeTraitsFromAddress(
     firstSeenBlock: Number(latestBlock) - Math.floor(seed(6) / 2),
     analyzedAt: Math.floor(Date.now() / 1000),
   };
+}
+
+const FALLBACK_INSIGHTS: Record<number, string> = {
+  0: "Your on-chain genome screams DeFi maximalist — high protocol churn, aggressive yield hunting, and a risk tolerance that would make most wallets nervous. You live in the Mantle DeFi trenches.",
+  1: "Diamond hands aren't just a meme for you — they're a strategy. Your wallet accumulates quietly, rarely blinks, and trusts the long game. Mantle's low fees are your secret weapon.",
+  2: "You see digital ownership differently. NFTs aren't just JPEGs to you — they're provenance, identity, and culture. Your Mantle wallet curates a gallery most would envy.",
+  3: "You've cracked the passive yield code. Liquidity provision, compounding rewards, and protocol-hopping for the best APY define your DNA. Your MNT works harder than most.",
+  4: "You're early. Your Mantle journey is just beginning, but the on-chain patterns forming now will define your web3 identity for years. The ecosystem is yours to explore.",
+  5: "Every transaction you make is a market signal. Large positions, strategic timing, and methodical accumulation put you in a class where most wallets just watch from the sidelines.",
+  6: "Sharp entries, clean exits. Your trading DNA shows a pattern of precision — you read momentum, position accordingly, and rarely overstay your welcome in a trade.",
+};
+
+const FALLBACK_STRENGTHS: Record<number, string[]> = {
+  0: ["Protocol risk assessment", "APY optimization", "Gas efficiency on Mantle"],
+  1: ["Long-term conviction holding", "MNT accumulation discipline", "Low-frequency trading"],
+  2: ["Digital asset curation", "Community participation", "Cross-protocol exploration"],
+  3: ["Liquidity provision timing", "Yield compounding", "Risk-adjusted returns"],
+  4: ["Open-minded exploration", "Early adopter positioning", "Learning velocity"],
+  5: ["Position sizing", "Market impact awareness", "Strategic liquidity deployment"],
+  6: ["Trade execution precision", "Momentum reading", "DEX navigation"],
+};
+
+const FALLBACK_WATCHOUTS: Record<number, string> = {
+  0: "High DeFi activity increases smart contract exposure — diversify across audited Mantle protocols like Init Capital rather than concentrating in single pools.",
+  1: "Diamond hands can miss the exit. Set trailing stops or partial-take-profit targets, especially on high-conviction positions in volatile MNT pairs.",
+  2: "NFT liquidity on Mantle is still maturing — ensure your positions aren't overly concentrated in illiquid collections with wide bid-ask spreads.",
+  3: "Impermanent loss can erode yield farming gains in volatile pairs. Stick to stable-correlated pools on Agni Finance for your core LP positions.",
+  4: "New wallets are prime targets for phishing and rug pulls. Stick to established Mantle protocols and verify all contract addresses before approving.",
+  5: "Whale wallets are watched. Your moves on-chain are visible to MEV bots and front-runners — consider using private mempools or splitting large transactions.",
+  6: "Overtrading erodes alpha. Transaction costs add up even on Mantle — track your net P&L after fees to ensure your edge isn't being eaten by friction.",
+};
+
+const FALLBACK_PREDICTIONS: Record<number, string> = {
+  0: "You'll likely be among the first to provide liquidity when Agni Finance launches new incentivized pairs — your DeFi DNA makes you an early LP adopter.",
+  1: "Expect to quietly stack mETH Protocol staking positions as Mantle expands its liquid staking yield. Patience is your edge.",
+  2: "When Mantle NFT Market launches its next flagship drop, your wallet will be early — you have the eye and the timing.",
+  3: "Your yield farming instincts will steer you toward Init Capital's new leveraged yield strategies — high APY with smart risk management is your sweet spot.",
+  4: "Your next on-chain milestone is likely your first Agni Finance swap or mETH staking deposit — welcome to the Mantle DeFi ecosystem.",
+  5: "You'll likely make a significant Lendle deposit to earn yield on idle capital while maintaining strategic liquidity for larger market opportunities.",
+  6: "You'll be watching Merchant Moe's order book closely for the next MNT/USDT breakout — your chart-reading instincts are finely tuned.",
+};
+
+function generateFallbackInsight(traits: WalletTraits, archetypeName: string): string {
+  return FALLBACK_INSIGHTS[traits.archetype] ?? `Your ${archetypeName} DNA is clear from the on-chain patterns — a unique signature in the Mantle ecosystem with scores shaped by real activity.`;
+}
+
+function generateFallbackStrengths(traits: WalletTraits): string[] {
+  return FALLBACK_STRENGTHS[traits.archetype] ?? ["On-chain discipline", "Mantle ecosystem awareness", "Consistent behavior"];
+}
+
+function generateFallbackWatchOut(archetype: number): string {
+  return FALLBACK_WATCHOUTS[archetype] ?? "Stay diversified across Mantle protocols and verify all contract addresses before interacting.";
+}
+
+function generateFallbackPrediction(archetype: number, deFiScore: number): string {
+  const base = FALLBACK_PREDICTIONS[archetype] ?? "Your next move in the Mantle ecosystem will likely align with your dominant DNA traits.";
+  return deFiScore > 700 ? base + " High DeFi score suggests aggressive protocol adoption ahead." : base;
 }
