@@ -9,7 +9,10 @@ export const metadata: Metadata = {
   title: "Mantle DNA — Discover Your On-Chain Identity",
   description:
     "AI-powered wallet personality analysis on Mantle Network. Discover your on-chain DNA and mint it as a Soulbound NFT.",
-  metadataBase: new URL("https://mantle-dna.vercel.app"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+  ),
   openGraph: {
     title: "Mantle DNA — Discover Your On-Chain Identity",
     description:
