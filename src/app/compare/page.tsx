@@ -347,7 +347,12 @@ export default function ComparePage() {
             <span className="text-base font-bold text-white">Mantle DNA</span>
             <span className="text-gray-600 text-sm">/ Compare</span>
           </Link>
-          <WalletButton />
+          <div className="flex items-center gap-4">
+            <Link href="/about" className="hidden sm:block text-sm text-gray-500 hover:text-emerald-400 transition-colors">
+              About
+            </Link>
+            <WalletButton />
+          </div>
         </div>
       </header>
 
