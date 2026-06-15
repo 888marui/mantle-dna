@@ -211,6 +211,8 @@ export default function WalletPage({ params }: { params: { address: string } }) 
                   hodl: String(analysis.holdScore),
                   diversity: String(analysis.diversityScore),
                   activity: String(analysis.activityScore),
+                  network: analysis.network,
+                  mantleScore: String(analysis.mantleScore),
                 }).toString()}`}
                 download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"

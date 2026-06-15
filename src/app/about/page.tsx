@@ -36,10 +36,10 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { name: "Next.js 14", role: "App Router, API routes, Edge runtime OG images", icon: "⚡" },
-              { name: "Mantle RPC (dual-network)", role: "Live MNT balance, tx count, and ERC-20 tokens on Mainnet & Sepolia", icon: "🔗" },
-              { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK — references real token data", icon: "🤖" },
+              { name: "Mantle RPC (dual-network)", role: "Live MNT balance, tx count, ERC-20 tokens (USDT/USDC/mETH/WMNT) on Mainnet & Sepolia", icon: "🔗" },
+              { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK — references real token holdings and scores", icon: "🤖" },
               { name: "viem + wagmi v2", role: "Type-safe Ethereum + ERC-20 readContract, wallet connect for both chains", icon: "🔧" },
-              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards downloadable as DNA Certificates", icon: "🖼️" },
+              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards with network badge, Mantle Score, downloadable as DNA Certificates", icon: "🖼️" },
               { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI insight keccak256 hash", icon: "🎭" },
               { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with self-mint, oracle-mint, and full test coverage", icon: "⛓️" },
               { name: "Tailwind CSS + SVG", role: "Animated DNA helix with ATCG labels, radar chart, base composition", icon: "🎨" },
@@ -61,7 +61,7 @@ export default function AboutPage() {
             {[
               {
                 step: "1. Dual-Network On-Chain Analysis",
-                desc: "Submit a wallet address with Mantle Mainnet or Sepolia selection. We fetch the real MNT balance, transaction nonce, and on Mainnet — real ERC-20 token balances (USDT, USDC, mETH) via readContract. These feed into a trait computation engine calculating DeFi Engagement, HODLing, Protocol Diversity, and On-chain Activity scores (0–1000 each), adjusted by actual token holdings.",
+                desc: "Submit a wallet address with Mantle Mainnet or Sepolia selection. We fetch the real MNT balance, transaction nonce, and on Mainnet — real ERC-20 token balances (USDT, USDC, mETH, WMNT) via readContract. These feed into a trait computation engine calculating DeFi Engagement, HODLing, Protocol Diversity, and On-chain Activity scores (0–1000 each), adjusted by actual token holdings. A Mantle Ecosystem Score (0-100) is also computed from on-chain engagement signals.",
               },
               {
                 step: "2. Rule-Based Archetype Classification",
@@ -72,8 +72,8 @@ export default function AboutPage() {
                 desc: "Claude Haiku (claude-haiku-4-5-20251001) generates a unique insight, 3 on-chain strengths, a risk watch-out, and a Mantle ecosystem prediction — grounded in the wallet's actual trait scores and network context. A deterministic fallback ensures insights always display even without an API key.",
               },
               {
-                step: "4. Visual DNA + Social Sharing",
-                desc: "The wallet genome is rendered as: an animated double helix with labeled A-T/C-G base pairs, a 4-axis radar chart, a 32-character ATCG sequence, and a base composition breakdown (% A, T, C, G unique to each address). Each wallet gets a shareable URL with a dynamically generated OG image downloadable as a 1200×630 DNA Certificate PNG.",
+                step: "4. Visual DNA + Social Sharing + Evolution Path",
+                desc: "The wallet genome is rendered as: an animated double helix with labeled A-T/C-G base pairs, a 4-axis radar chart, a 32-character ATCG sequence, and a base composition breakdown (% A, T, C, G unique to each address). A DNA Evolution Path shows the next archetype to unlock, with score progress bars and 2 actionable Mantle protocol cards. Each wallet gets a shareable URL with a dynamically generated OG image (with network badge + Mantle Score) downloadable as a 1200×630 DNA Certificate PNG.",
               },
               {
                 step: "5. Soulbound NFT Mint",
