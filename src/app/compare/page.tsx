@@ -160,7 +160,12 @@ function MiniCard({ analysis }: { analysis: WalletAnalysis }) {
 
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-500">Mantle Score</span>
-        <span className="font-bold" style={{ color }}>{analysis.mantleScore}/100</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px]">
+            {analysis.mantleScore >= 80 ? "💜" : analysis.mantleScore >= 60 ? "🏆" : analysis.mantleScore >= 30 ? "🥈" : "🥉"}
+          </span>
+          <span className="font-bold" style={{ color }}>{analysis.mantleScore}/100</span>
+        </div>
       </div>
 
       {analysis.aiInsight && (
@@ -283,19 +288,25 @@ export default function ComparePage() {
   const [loadingB, setLoadingB] = useState(false);
   const [errorA, setErrorA] = useState<string | null>(null);
   const [errorB, setErrorB] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const analyzeA = useCallback(async () => {
-    if (!isAddress(addrA)) return;
+  const analyzeA = useCallback(async (addr?: string, net?: NetworkType) => {
+    const a = addr ?? addrA;
+    const n = net ?? networkA;
+    if (!isAddress(a)) return;
     setLoadingA(true); setErrorA(null); setAnalysisA(null);
-    try { setAnalysisA(await analyzeWallet(addrA, networkA)); }
+    try { setAnalysisA(await analyzeWallet(a, n)); }
     catch { setErrorA("Failed to analyze wallet A"); }
     finally { setLoadingA(false); }
   }, [addrA, networkA]);
 
-  const analyzeB = useCallback(async () => {
-    if (!isAddress(addrB)) return;
+  const analyzeB = useCallback(async (addr?: string, net?: NetworkType) => {
+    const b = addr ?? addrB;
+    const n = net ?? networkB;
+    if (!isAddress(b)) return;
     setLoadingB(true); setErrorB(null); setAnalysisB(null);
-    try { setAnalysisB(await analyzeWallet(addrB, networkB)); }
+    try { setAnalysisB(await analyzeWallet(b, n)); }
     catch { setErrorB("Failed to analyze wallet B"); }
     finally { setLoadingB(false); }
   }, [addrB, networkB]);
@@ -337,7 +348,12 @@ export default function ComparePage() {
             <span className="text-base font-bold text-white">Mantle DNA</span>
             <span className="text-gray-600 text-sm">/ Compare</span>
           </Link>
-          <WalletButton />
+          <div className="flex items-center gap-4">
+            <Link href="/about" className="hidden sm:block text-sm text-gray-500 hover:text-emerald-400 transition-colors">
+              About
+            </Link>
+            <WalletButton />
+          </div>
         </div>
       </header>
 
@@ -403,6 +419,8 @@ export default function ComparePage() {
                     setAddrB(ex.b);
                     setNetworkA("mainnet");
                     setNetworkB("mainnet");
+                    analyzeA(ex.a, "mainnet");
+                    analyzeB(ex.b, "mainnet");
                   }}
                   className="px-3 py-1.5 rounded-full text-xs border border-gray-700 text-gray-400 hover:border-emerald-700 hover:text-emerald-400 transition-colors"
                 >
@@ -461,17 +479,73 @@ export default function ComparePage() {
 
         {/* Share comparison link */}
         {analysisA && analysisB && (
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
-                const url = `${window.location.origin}/compare?a=${addrA}&b=${addrB}`;
+                const url = `${window.location.origin}/compare?a=${addrA}&b=${addrB}&network=${networkA}`;
                 navigator.clipboard.writeText(url).catch(() => {});
-                alert("Comparison link copied!");
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
               }}
-              className="text-xs text-emerald-600 hover:text-emerald-400 transition-colors underline underline-offset-2"
+              className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg border border-gray-700 hover:border-emerald-700 text-gray-400 hover:text-emerald-400 transition-colors"
             >
-              Copy shareable comparison link
+              {copied ? "✓ Copied!" : "🔗 Copy comparison link"}
             </button>
+            {analysisA && analysisB && (() => {
+              const compat = getCompatScore(analysisA.archetype, analysisB.archetype);
+              const compareUrl = `${window.location.origin}/compare?a=${addrA}&b=${addrB}&network=${networkA}`;
+              const shareText = `🧬 DNA Comparison on Mantle\n\n${analysisA.archetypeEmoji} ${analysisA.archetypeName} vs ${analysisB.archetypeEmoji} ${analysisB.archetypeName}\n\nCompatibility: ${compat}% · DNA Distance: ${getDNADistance(analysisA, analysisB)}\n\nMantle Scores: ${analysisA.mantleScore} vs ${analysisB.mantleScore}\n\n${compareUrl}\n#MantleDNA #Mantle`;
+              const ogCompareUrl = `/api/og-compare?${new URLSearchParams({
+                a: addrA, b: addrB,
+                archetypeA: String(analysisA.archetype), archetypeB: String(analysisB.archetype),
+                scoreA: String(analysisA.mantleScore), scoreB: String(analysisB.mantleScore),
+                compat: String(compat), network: networkA,
+              }).toString()}`;
+              return (
+                <>
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-black hover:bg-gray-900 border border-gray-700 text-white transition-colors"
+                  >
+                    Share on 𝕏
+                  </a>
+                  <a
+                    href={`https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(compareUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg text-white transition-colors hover:opacity-80"
+                    style={{ background: "#7c3aed", border: "1px solid #6d28d9" }}
+                  >
+                    ⬡ Farcaster
+                  </a>
+                  <button
+                    onClick={async () => {
+                      setIsDownloading(true);
+                      try {
+                        const res = await fetch(ogCompareUrl);
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `mantle-dna-compare-${addrA.slice(0, 6)}-${addrB.slice(0, 6)}.png`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      } catch {
+                        window.open(ogCompareUrl, "_blank");
+                      } finally {
+                        setIsDownloading(false);
+                      }
+                    }}
+                    disabled={isDownloading}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-50"
+                  >
+                    {isDownloading ? "Preparing..." : "↓ Download"}
+                  </button>
+                </>
+              );
+            })()}
           </div>
         )}
 

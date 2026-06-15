@@ -26,6 +26,7 @@ const MAINNET_TOKENS = [
 ];
 
 const ARCHETYPE_NAMES = ["DeFi Degen", "Diamond Hands", "NFT Collector", "Yield Farmer", "Newcomer", "Whale", "Trader"];
+const ARCHETYPE_EMOJIS = ["🔥", "💎", "🎨", "🌾", "🌱", "🐋", "📊"];
 
 // Archetype compatibility (0-100)
 const COMPATIBILITY: Record<string, number> = {
@@ -132,6 +133,7 @@ async function analyzeAddress(address: `0x${string}`, network: "mainnet" | "sepo
     tokenBalances: tokenCount > 0 ? tokenBalances : undefined,
     archetype,
     archetypeName: ARCHETYPE_NAMES[archetype],
+    archetypeEmoji: ARCHETYPE_EMOJIS[archetype],
     scores: { deFiScore, holdScore, diversityScore, activityScore },
     mantleScore,
     dnaStrength: Math.round((deFiScore + holdScore + diversityScore + activityScore) / 40),
@@ -200,4 +202,15 @@ export async function GET(req: NextRequest) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: "Comparison failed", detail: msg }, { status: 500 });
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }

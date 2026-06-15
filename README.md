@@ -167,7 +167,7 @@ Key properties:
 | Frontend | Next.js 14, TypeScript, Tailwind CSS |
 | Web3 | wagmi v2, viem (`readContract`, `writeContract`), injected connector |
 | AI | Claude Haiku (`claude-haiku-4-5-20251001`) via Anthropic SDK |
-| OG Images | `next/og` ImageResponse (edge runtime) — 1200×630 with network badge + Mantle Score |
+| OG Images | `next/og` ImageResponse (edge runtime) — `/api/og` (wallet certificate) + `/api/og-compare` (side-by-side comparison), per-wallet `opengraph-image.tsx` |
 | Contract | Solidity 0.8.20, OpenZeppelin ERC-721, Hardhat |
 | Networks | Mantle Mainnet (5000) + Sepolia Testnet (5003) |
 | Deployment | Vercel (frontend), Hardhat (contract) |
@@ -225,9 +225,24 @@ npx hardhat run scripts/deploy.js --network mantle_testnet
 
 ---
 
+## Public REST API
+
+All endpoints are CORS-enabled with full OPTIONS preflight support.
+
+```
+GET  /api/wallet/{address}?network=mainnet|sepolia   → DNA analysis JSON (+ archetypeReason)
+GET  /api/compare?a={addr}&b={addr}&network=...      → side-by-side DNA comparison
+POST /api/batch                                      → batch up to 10 wallets, sorted by Mantle Score
+GET  /api/health                                     → endpoint directory
+GET  /api/og?address=...                             → 1200×630 wallet DNA certificate PNG
+GET  /api/og-compare?a=...&b=...&compat=...          → 1200×630 comparison card PNG
+```
+
+---
+
 ## Built for Mantle Turing Test Hackathon 2026
 
-- ⚡ **Technical Depth** — real ERC-20 data from 4 Mantle tokens, Claude AI, SBT with on-chain AI hash, Edge OG images
-- 💡 **Innovation** — DNA metaphor + Evolution Path showing users exactly how to improve on Mantle
-- 🔗 **Mantle Ecosystem** — 8 protocol integrations, live WMNT/mETH/stablecoin tracking, Mantle Ecosystem Score
-- ✅ **Product Complete** — end-to-end: analyze → AI insight → visualize → share (𝕏 + Farcaster) → mint SBT
+- ⚡ **Technical Depth** — 4× live ERC-20 balances, Claude Haiku AI, keccak256 on-chain AI hash, 5× public REST APIs + 2× edge OG image routes, per-wallet `opengraph-image.tsx`, in-memory analysis cache, archetypeReason field, sitemap + robots.txt
+- 💡 **Innovation** — DNA metaphor + ATCG visualization + Evolution Path + Bronze/Silver/Gold/Platinum tier system + DNA Comparison with compatibility score + DNA distance + downloadable comparison card
+- 🔗 **Mantle Ecosystem** — 8 protocol integrations, live WMNT/mETH/stablecoin tracking, Mantle Ecosystem Score (0-100), protocol affinity per archetype, Evolution Path with protocol action cards
+- ✅ **Product Complete** — analyze → AI insight → visualize → share (𝕏 + Farcaster) → download DNA Certificate → mint SBT · Compare wallets with auto-analyze example pairs · Dual-network · Shareable URLs

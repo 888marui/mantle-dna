@@ -130,7 +130,12 @@ export function getExplorerUrl(address: string, network: NetworkType = 'sepolia'
   return `${base}/address/${address}`;
 }
 
+const analysisCache = new Map<string, WalletAnalysis>();
+
 export async function analyzeWallet(address: string, network: NetworkType = 'sepolia'): Promise<WalletAnalysis> {
+  const cacheKey = `${address.toLowerCase()}-${network}`;
+  const cached = analysisCache.get(cacheKey);
+  if (cached) return cached;
   const rpcUrl = network === 'mainnet'
     ? (process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz")
     : (process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz");
@@ -226,6 +231,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
         archetype: archetype.name,
         network,
         tokenBalances,
+        mantleScore: traits.mantleScore,
       }),
     });
 
@@ -248,6 +254,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
     analysis.aiPrediction = generateFallbackPrediction(traits.archetype, traits.deFiScore);
   }
 
+  analysisCache.set(cacheKey, analysis);
   return analysis;
 }
 

@@ -165,6 +165,7 @@ export async function GET(req: NextRequest) {
   const network = searchParams.get("network") ?? "mainnet";
   const mantleScore = Number(searchParams.get("mantleScore") ?? 0);
 
+  const isDownload = searchParams.get("download") === "1";
   const shortAddr = `${address.slice(0, 10)}...${address.slice(-8)}`;
   const totalPct = Math.round((defi + hodl + diversity + activity) / 40);
 
@@ -297,7 +298,7 @@ export async function GET(req: NextRequest) {
                 color: color,
                 display: "flex",
               }}>
-                Mantle Score {mantleScore}/100
+                {mantleScore >= 80 ? "💜 Platinum" : mantleScore >= 60 ? "🏆 Gold" : mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze"} · {mantleScore}/100
               </div>
             )}
           </div>
@@ -393,6 +394,9 @@ export async function GET(req: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1200, height: 630 }
+    {
+      width: 1200,
+      height: 630,
+    }
   );
 }

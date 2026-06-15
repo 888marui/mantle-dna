@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
     successful: output.filter((r) => r.status === "ok").length,
     failed: output.filter((r) => r.status === "error").length,
     archetypeDistribution: ARCHETYPE_NAMES.reduce((acc, name, i) => {
-      acc[name] = output.filter((r) => r.status === "ok" && r.data?.archetype === i).length;
+      const count = output.filter((r) => r.status === "ok" && r.data?.archetype === i).length;
+      if (count > 0) acc[name] = count;
       return acc;
     }, {} as Record<string, number>),
     topArchetype: (() => {

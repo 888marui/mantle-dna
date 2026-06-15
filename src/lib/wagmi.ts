@@ -10,5 +10,20 @@ export const config = createConfig({
     [mantleTestnet.id]: http("https://rpc.sepolia.mantle.xyz"),
     [mantleMainnet.id]: http("https://rpc.mantle.xyz"),
   },
-  connectors: [injected()],
+  connectors: [
+    injected({ target: "metaMask" }),
+    injected({
+      target() {
+        return {
+          id: "okxWallet",
+          name: "OKX Wallet",
+          provider:
+            typeof window !== "undefined"
+              ? (window as unknown as { okxwallet?: Window["ethereum"] }).okxwallet
+              : undefined,
+        };
+      },
+    }),
+    injected(), // Generic fallback: Coinbase, Rabby, Brave, etc.
+  ],
 });

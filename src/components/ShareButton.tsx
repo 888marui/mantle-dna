@@ -26,7 +26,8 @@ export function ShareButton({ analysis }: Props) {
   });
   const walletUrl = `${appUrl}/wallet/${analysis.address}?${ogParams.toString()}`;
 
-  const shareText = `🧬 My Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\n${walletUrl}\n#MantleDNA #Mantle #Web3`;
+  const mantleTier = analysis.mantleScore >= 80 ? "💜 Platinum" : analysis.mantleScore >= 60 ? "🏆 Gold" : analysis.mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze";
+  const shareText = `🧬 My Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100 ${mantleTier}\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\n${walletUrl}\n#MantleDNA #Mantle #Web3`;
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
   const farcasterUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(walletUrl)}`;
 
