@@ -368,6 +368,44 @@ export default function Home() {
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800/40 px-6 py-8 mt-8">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
+          <div className="flex items-center gap-2">
+            <span>🧬</span>
+            <span className="font-semibold text-gray-500">Mantle DNA</span>
+            <span>—</span>
+            <span>Built on Mantle Network</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://mantle.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              Mantle ↗
+            </a>
+            <a
+              href="https://explorer.sepolia.mantle.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              Explorer ↗
+            </a>
+            <a
+              href="https://dorahacks.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              DoraHacks ↗
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

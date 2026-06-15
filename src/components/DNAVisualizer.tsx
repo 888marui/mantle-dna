@@ -124,6 +124,17 @@ export function DNAVisualizer({ analysis }: Props) {
         <RadarChart analysis={analysis} accentColor={accentColor} />
       </div>
 
+      {/* DNA Sequence Code */}
+      <div className="space-y-1.5">
+        <div className="text-xs text-gray-600 uppercase tracking-wider">Sequence ID</div>
+        <div
+          className="font-mono text-xs leading-relaxed break-all"
+          style={{ color: `${accentColor}80` }}
+        >
+          {generateDNACode(analysis.address)}
+        </div>
+      </div>
+
       {/* Timestamp */}
       <div className="text-xs text-gray-600 text-center">
         Analyzed {new Date(analysis.analyzedAt * 1000).toLocaleString()}
@@ -166,6 +177,18 @@ function generateStrands(analysis: WalletAnalysis, colors: string[]): Strand[] {
     strands.push({ y, leftX, rightX, color: colors[colorIndex], opacity });
   }
   return strands;
+}
+
+function generateDNACode(address: string): string {
+  const hex = address.toLowerCase().replace("0x", "");
+  // Interleave with complementary bases to look like a DNA sequence
+  const bases = "ATCGATCGATCGATCG";
+  let code = "";
+  for (let i = 0; i < 32; i++) {
+    code += hex[i % hex.length];
+    if ((i + 1) % 8 === 0 && i < 31) code += " ";
+  }
+  return code.toUpperCase();
 }
 
 function RadarChart({ analysis, accentColor }: { analysis: WalletAnalysis; accentColor: string }) {
