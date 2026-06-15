@@ -44,6 +44,7 @@ export function DNAVisualizer({ analysis }: Props) {
         boxShadow: `0 0 0 1px ${accentColor}40, 0 4px 32px ${accentColor}18`,
         background: `linear-gradient(#111827cc, #111827cc) padding-box,
                      linear-gradient(135deg, ${accentColor}60, transparent 50%, ${accentColor}30) border-box`,
+        animation: "fadeSlideIn 0.4s ease-out 0.1s both",
       }}
     >
       {/* Subtle top-edge glow line */}
@@ -164,12 +165,14 @@ export function DNAVisualizer({ analysis }: Props) {
         </div>
       </div>
 
+      {/* Base Composition */}
+      <BaseComposition address={analysis.address} accentColor={accentColor} />
+
       {/* Timestamp */}
       <div className="text-xs text-gray-600 text-center">
         Analyzed {new Date(analysis.analyzedAt * 1000).toLocaleString()}
       </div>
 
-      {/* Keyframe for node pulse */}
       <style>{`
         @keyframes helixPulse {
           0%, 100% { r: 5.5; opacity: var(--base-opacity, 0.8); }
@@ -333,6 +336,50 @@ function RadarChart({ analysis, accentColor }: { analysis: WalletAnalysis; accen
         {/* Center dot */}
         <circle cx={cx} cy={cy} r={3} fill={`${accentColor}60`} />
       </svg>
+    </div>
+  );
+}
+
+function BaseComposition({ address, accentColor }: { address: string; accentColor: string }) {
+  const hex = address.toLowerCase().replace("0x", "");
+  const counts: Record<string, number> = { A: 0, T: 0, C: 0, G: 0 };
+  const bases = ["A", "T", "C", "G"] as const;
+
+  for (let i = 0; i < Math.min(hex.length, 40); i++) {
+    const nibble = parseInt(hex[i], 16) || 0;
+    counts[bases[nibble % 4]]++;
+  }
+
+  const total = Object.values(counts).reduce((s, n) => s + n, 0);
+  const BASE_COLORS: Record<string, string> = { A: "#10b981", T: "#3b82f6", C: "#f97316", G: "#a855f7" };
+
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-gray-600 uppercase tracking-wider">Base Composition</div>
+      <div className="grid grid-cols-4 gap-2">
+        {bases.map((base) => {
+          const pct = Math.round((counts[base] / total) * 100);
+          const color = BASE_COLORS[base];
+          return (
+            <div key={base} className="space-y-1 text-center">
+              <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${pct}%`,
+                    background: color,
+                    animation: "fillBar 1s cubic-bezier(0.4,0,0.2,1) both",
+                    ["--bar-width" as string]: `${pct}%`,
+                  }}
+                />
+              </div>
+              <div className="text-[10px] font-mono" style={{ color }}>
+                {base} <span className="text-gray-600">{pct}%</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
