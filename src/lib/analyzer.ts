@@ -5,6 +5,7 @@ export type NetworkType = 'mainnet' | 'sepolia';
 
 export interface WalletTraits {
   archetype: number;
+  archetypeReason: string;
   txCount: number;
   deFiScore: number;
   holdScore: number;
@@ -229,16 +230,33 @@ function computeTraitsFromAddress(
     : seed(4) % 1000;
 
   let archetype: number;
-  if (balanceEth > 100) archetype = 5;       // Whale
-  else if (txCount < 5) archetype = 4;        // Newcomer
-  else if (deFiScore > 800) archetype = 0;    // DeFi Degen
-  else if (holdScore > 800) archetype = 1;    // Diamond Hands
-  else if (diversityScore > 700 && deFiScore > 500) archetype = 3; // Yield Farmer
-  else if (activityScore > 750) archetype = 6; // Trader
-  else archetype = 2;                          // NFT Collector
+  let archetypeReason: string;
+  if (balanceEth > 100) {
+    archetype = 5;
+    archetypeReason = `MNT balance ${balanceEth.toFixed(2)} > 100 MNT threshold → Whale classification`;
+  } else if (txCount < 5) {
+    archetype = 4;
+    archetypeReason = `Transaction count ${txCount} < 5 → Newcomer (early-stage wallet)`;
+  } else if (deFiScore > 800) {
+    archetype = 0;
+    archetypeReason = `DeFi score ${deFiScore}/1000 exceeds 800 threshold → DeFi Degen`;
+  } else if (holdScore > 800) {
+    archetype = 1;
+    archetypeReason = `HODLing score ${holdScore}/1000 exceeds 800 threshold → Diamond Hands`;
+  } else if (diversityScore > 700 && deFiScore > 500) {
+    archetype = 3;
+    archetypeReason = `Protocol diversity ${diversityScore}/1000 > 700 + DeFi ${deFiScore}/1000 > 500 → Yield Farmer`;
+  } else if (activityScore > 750) {
+    archetype = 6;
+    archetypeReason = `Activity score ${activityScore}/1000 exceeds 750 threshold → Trader`;
+  } else {
+    archetype = 2;
+    archetypeReason = `Balanced profile: DeFi ${deFiScore}, HODLing ${holdScore}, Diversity ${diversityScore} → NFT Collector`;
+  }
 
   return {
     archetype,
+    archetypeReason,
     txCount,
     deFiScore,
     holdScore,

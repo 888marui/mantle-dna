@@ -189,6 +189,14 @@ export function DNACard({ analysis }: Props) {
       {/* Description */}
       <p className="text-sm text-gray-400 leading-relaxed">{analysis.description}</p>
 
+      {/* Archetype classification reason */}
+      <div
+        className="px-3 py-2 rounded-lg text-[11px] font-mono text-gray-600 leading-relaxed"
+        style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
+      >
+        <span className="text-gray-700">›</span> {analysis.archetypeReason}
+      </div>
+
       {/* Total DNA Score */}
       {(() => {
         const totalPct = Math.round(
