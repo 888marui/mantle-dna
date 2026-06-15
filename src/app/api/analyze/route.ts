@@ -17,15 +17,18 @@ export async function POST(req: NextRequest) {
       diversityScore,
       activityScore,
       archetype,
+      network = 'sepolia',
     } = body;
 
     if (!address) {
       return NextResponse.json({ error: "Missing address" }, { status: 400 });
     }
 
+    const networkLabel = network === 'mainnet' ? 'Mantle Mainnet' : 'Mantle Sepolia testnet';
     const prompt = `You are a witty on-chain DNA analyst for Mantle Network. Analyze this wallet's on-chain genome:
 
 Wallet: ${address}
+Network: ${networkLabel}
 Archetype: ${archetype} (their dominant on-chain personality)
 MNT Balance: ${balance} MNT
 Transaction Count: ${txCount}

@@ -8,32 +8,45 @@ import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { SearchBar } from "@/components/SearchBar";
 
-const FEATURED_WALLETS = [
+const FEATURED_WALLETS: Array<{ address: string; archetype: string; emoji: string; label: string; network: NetworkType }> = [
   {
     address: "0x000000000000000000000000000000000000dEaD",
     archetype: "Diamond Hands",
     emoji: "💎",
-    label: "Dead Address",
+    label: "Burn Address",
+    network: "mainnet",
   },
   {
     address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
     archetype: "DeFi Degen",
     emoji: "🔥",
     label: "Vitalik.eth",
+    network: "mainnet",
   },
   {
     address: "0x1f9090aaE28b8a3dCeaDf281B0F12828e676c326",
     archetype: "Trader",
     emoji: "📊",
     label: "MEV Builder",
+    network: "mainnet",
   },
 ];
 
 const STATS = [
-  { label: "Hackers", value: "1,500+" },
-  { label: "Network", value: "Mantle Testnet" },
+  { label: "Archetypes", value: "7 Types" },
+  { label: "Network", value: "Mantle" },
   { label: "Analysis", value: "AI-Powered" },
-  { label: "Prize Pool", value: "$100K" },
+  { label: "Identity", value: "Soulbound" },
+];
+
+const ARCHETYPES_GALLERY = [
+  { name: "DeFi Degen", emoji: "🔥", color: "#f97316", rarity: "12%", desc: "High-frequency swaps, yield chasing, protocol hopping." },
+  { name: "Diamond Hands", emoji: "💎", color: "#06b6d4", rarity: "18%", desc: "Patient accumulation, low churn, long-term conviction." },
+  { name: "NFT Collector", emoji: "🎨", color: "#a855f7", rarity: "22%", desc: "Digital art, collectibles, and cultural curation." },
+  { name: "Yield Farmer", emoji: "🌾", color: "#22c55e", rarity: "8%", desc: "Liquidity provision, compounding rewards, APY hunting." },
+  { name: "Newcomer", emoji: "🌱", color: "#10b981", rarity: "25%", desc: "Fresh wallet, early explorer of the Mantle ecosystem." },
+  { name: "Whale", emoji: "🐋", color: "#3b82f6", rarity: "3%", desc: "High-value positions, strategic moves, market impact." },
+  { name: "Trader", emoji: "📊", color: "#eab308", rarity: "12%", desc: "Precision DEX execution, momentum reading, sharp timing." },
 ];
 
 const RECENT_KEY = "mantle_dna_recent";
@@ -312,6 +325,48 @@ export default function Home() {
           </div>
         )}
 
+        {/* Archetype Gallery */}
+        {!analysis && !loading && (
+          <div className="space-y-4">
+            <div className="text-center space-y-1">
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                DNA Archetypes
+              </h2>
+              <p className="text-xs text-gray-600">Which one are you?</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+              {ARCHETYPES_GALLERY.map((a) => (
+                <div
+                  key={a.name}
+                  className="group relative p-3 rounded-xl flex flex-col items-center gap-2 text-center cursor-default"
+                  style={{
+                    background: `${a.color}08`,
+                    border: `1px solid ${a.color}25`,
+                  }}
+                >
+                  <span className="text-2xl">{a.emoji}</span>
+                  <div
+                    className="text-xs font-semibold leading-tight"
+                    style={{ color: a.color }}
+                  >
+                    {a.name}
+                  </div>
+                  <div
+                    className="text-[10px] px-1.5 py-0.5 rounded-full"
+                    style={{ background: `${a.color}15`, color: `${a.color}99` }}
+                  >
+                    {a.rarity}
+                  </div>
+                  {/* Tooltip on hover */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 p-2 rounded-lg bg-gray-900 border border-gray-700 text-[10px] text-gray-400 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
+                    {a.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Featured Wallets */}
         {!analysis && !loading && (
           <div className="space-y-4">
@@ -320,7 +375,7 @@ export default function Home() {
               {FEATURED_WALLETS.map((fw) => (
                 <button
                   key={fw.address}
-                  onClick={() => handleAnalyze(fw.address)}
+                  onClick={() => handleAnalyze(fw.address, fw.network)}
                   className="p-4 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-emerald-700 transition-colors text-left space-y-2 group"
                 >
                   <div className="flex items-center gap-3">
