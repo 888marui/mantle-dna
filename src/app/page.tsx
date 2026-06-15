@@ -246,6 +246,49 @@ export default function Home() {
           </div>
         )}
 
+        {/* How It Works */}
+        {!analysis && !loading && (
+          <div className="space-y-4">
+            <h2 className="text-sm font-semibold text-gray-400 text-center uppercase tracking-wider">
+              How It Works
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                {
+                  step: "01",
+                  icon: "🔍",
+                  title: "Paste Your Address",
+                  desc: "Enter any Mantle wallet address. We fetch your on-chain data live from Mantle Sepolia.",
+                },
+                {
+                  step: "02",
+                  icon: "🧬",
+                  title: "AI Analysis",
+                  desc: "Claude AI analyzes your DeFi activity, transaction patterns, and portfolio behavior to reveal your DNA.",
+                },
+                {
+                  step: "03",
+                  icon: "🎭",
+                  title: "Mint Your Identity",
+                  desc: "Receive one of 7 archetypes and mint it as a soulbound NFT — your permanent on-chain identity on Mantle.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 space-y-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-emerald-600 font-mono">{item.step}</span>
+                    <span className="text-2xl">{item.icon}</span>
+                  </div>
+                  <div className="text-sm font-semibold text-white">{item.title}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Featured Wallets */}
         {!analysis && !loading && (
           <div className="space-y-4">
