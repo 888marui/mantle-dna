@@ -112,6 +112,31 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Public REST API</h2>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Mantle DNA exposes a public JSON API for on-chain wallet analysis — no auth required.
+            Returns DNA scores, archetype, Mantle Ecosystem Score, and live token balances.
+          </p>
+          <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+            <div className="text-emerald-400">GET /api/wallet/{"{address}"}?network=mainnet</div>
+            <div className="text-gray-500 text-[11px] leading-relaxed">{`{
+  "address": "0x...",
+  "network": "mainnet",
+  "mntBalance": "12.3400",
+  "txCount": 42,
+  "tokenBalances": { "mETH": "1.50", "WMNT": "5.00" },
+  "archetype": 3,
+  "archetypeName": "Yield Farmer",
+  "scores": { "deFiScore": 720, "holdScore": 580, "diversityScore": 810, "activityScore": 340 },
+  "mantleScore": 65,
+  "dnaStrength": 61,
+  "explorerUrl": "https://explorer.mantle.xyz/address/0x...",
+  "analyzedAt": "2026-06-15T08:30:00.000Z"
+}`}</div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Mantle Ecosystem Integration</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
             Each archetype maps to a curated set of Mantle protocols based on behavioral affinity.
@@ -130,13 +155,25 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-2">
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-3">
           <div className="text-sm font-semibold text-emerald-400">Built for Mantle Turing Test Hackathon 2026</div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
-            <div>⚡ Technical Depth — AI + RPC + SBT + OG</div>
-            <div>💡 Innovation — DNA metaphor + social sharing</div>
-            <div>🔗 Mantle Ecosystem — 8 protocol integrations</div>
-            <div>✅ Product Complete — end-to-end working flow</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">⚡ Technical Depth (30%)</div>
+              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
+              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">🔗 Mantle Ecosystem (25%)</div>
+              <div className="text-gray-600">8 protocol integrations with direct links · WMNT + mETH live tracking · Protocol affinity per archetype · Evolution Path with protocol action cards</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">✅ Product Complete (20%)</div>
+              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Auto-analyze on paste/connect · Dual-network support</div>
+            </div>
           </div>
         </div>
       </div>
