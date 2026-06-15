@@ -44,7 +44,7 @@ export default function AboutPage() {
               { name: "Mantle RPC (dual-network)", role: "Live MNT balance, tx count, ERC-20 tokens (USDT/USDC/mETH/WMNT) on Mainnet & Sepolia", icon: "🔗" },
               { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK — references real token holdings and scores", icon: "🤖" },
               { name: "viem + wagmi v2", role: "Type-safe Ethereum + ERC-20 readContract, wallet connect for both chains", icon: "🔧" },
-              { name: "3× REST APIs", role: "GET /api/wallet, GET /api/compare, POST /api/batch — public, CORS-enabled, 60s cache", icon: "🌐" },
+              { name: "4× REST APIs", role: "GET /api/wallet, GET /api/compare, POST /api/batch, GET /api/health — public, CORS-enabled, full OPTIONS support", icon: "🌐" },
               { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards with network badge, Mantle Score, downloadable as DNA Certificates", icon: "🖼️" },
               { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI insight keccak256 hash", icon: "🎭" },
               { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with self-mint, oracle-mint, and full test coverage", icon: "⛓️" },
@@ -120,10 +120,15 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Public REST API</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Mantle DNA exposes a public JSON API for on-chain wallet analysis and comparison — no auth required.
+            Mantle DNA exposes a public JSON API for on-chain wallet analysis and comparison — no auth required, CORS-enabled.
             Returns DNA scores, archetype, Mantle Ecosystem Score, live token balances, and cross-wallet compatibility.
+            Start at <span className="font-mono text-emerald-500">GET /api/health</span> for a full endpoint listing.
           </p>
           <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+              <div className="text-emerald-400">GET /api/health</div>
+              <div className="text-gray-500 text-[11px] leading-relaxed">{`{ "status": "ok", "service": "Mantle DNA API", "endpoints": { ... }, "networks": ["mainnet", "sepolia"] }`}</div>
+            </div>
             <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
               <div className="text-emerald-400">POST /api/batch</div>
               <div className="text-gray-600 text-[11px]">Body: {"{ \"addresses\": [\"0x...\", \"0x...\"], \"network\": \"mainnet\" }"}</div>
@@ -192,7 +197,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">⚡ Technical Depth (30%)</div>
-              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract · 3× public REST APIs (wallet, compare, batch) with CORS + caching</div>
+              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract · 4× public REST APIs (wallet, compare, batch, health) with CORS + OPTIONS + caching · sitemap + robots.txt</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
