@@ -176,6 +176,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
         diversityScore: traits.diversityScore,
         activityScore: traits.activityScore,
         archetype: archetype.name,
+        network,
       }),
     });
 
