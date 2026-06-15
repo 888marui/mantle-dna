@@ -193,7 +193,8 @@ export default function WalletPage({ params }: { params: { address: string } }) 
 
             {/* Share row */}
             {(() => {
-              const shareText = `🧬 My Mantle DNA: ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100\n\n${analysis.aiInsight || analysis.description}\n\nDiscover yours 👇\nhttps://mantle-dna.xyz/wallet/${address}?network=${analysis.network}\n#MantleDNA #Mantle #Web3`;
+              const mantleTier = analysis.mantleScore >= 80 ? "💜 Platinum" : analysis.mantleScore >= 60 ? "🏆 Gold" : analysis.mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze";
+              const shareText = `🧬 My Mantle DNA: ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000 | Mantle Score: ${analysis.mantleScore}/100 ${mantleTier}\n\n${analysis.aiInsight || analysis.description}\n\nDiscover yours 👇\nhttps://mantle-dna.xyz/wallet/${address}?network=${analysis.network}\n#MantleDNA #Mantle #Web3`;
               const walletShareUrl = `https://mantle-dna.xyz/wallet/${address}?network=${analysis.network}`;
               return (
                 <div className="flex flex-wrap items-center justify-center gap-3">
