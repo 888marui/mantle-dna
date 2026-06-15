@@ -212,8 +212,14 @@ export default function Home() {
 
         {/* Error */}
         {error && (
-          <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-400 text-sm text-center">
-            {error}
+          <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-400 text-sm text-center space-y-2">
+            <p>{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="text-xs text-red-500 hover:text-red-400 underline underline-offset-2 transition-colors"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 

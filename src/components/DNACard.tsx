@@ -210,14 +210,17 @@ export function DNACard({ analysis }: Props) {
             border: `1px solid ${accentColor}30`,
           }}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-base">✨</span>
-            <span
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: accentColor }}
-            >
-              AI Analysis
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">✨</span>
+              <span
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: accentColor }}
+              >
+                AI Analysis
+              </span>
+            </div>
+            <span className="text-[10px] text-gray-600 font-mono">powered by Claude</span>
           </div>
           <p className="text-sm text-gray-300 leading-relaxed">{analysis.aiInsight}</p>
 
