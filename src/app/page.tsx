@@ -30,6 +30,27 @@ const FEATURED_WALLETS: Array<{ address: string; archetype: string; emoji: strin
     label: "MEV Builder",
     network: "mainnet",
   },
+  {
+    address: "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+    archetype: "Whale",
+    emoji: "🐋",
+    label: "Binance Cold Wallet",
+    network: "mainnet",
+  },
+  {
+    address: "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97",
+    archetype: "Yield Farmer",
+    emoji: "🌾",
+    label: "Machi Big Brother",
+    network: "mainnet",
+  },
+  {
+    address: "0xAbCdEf0000000000000000000000000000000001",
+    archetype: "Newcomer",
+    emoji: "🌱",
+    label: "Fresh Wallet",
+    network: "sepolia",
+  },
 ];
 
 const STATS = [
@@ -132,8 +153,15 @@ export default function Home() {
       setAnalysis(result);
       saveRecent(result);
       setRecentAnalyses(loadRecent());
-    } catch {
-      setError("Failed to analyze wallet. Make sure it's a valid Mantle address.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("timeout")) {
+        setError("Mantle RPC timed out — the network may be busy. Try again or switch to the other network.");
+      } else if (msg.includes("invalid") || msg.includes("address")) {
+        setError("Invalid wallet address format. Enter a valid 0x… Ethereum address.");
+      } else {
+        setError("Failed to fetch on-chain data. Check your connection and try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -371,7 +399,7 @@ export default function Home() {
         {!analysis && !loading && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-white text-center">Featured Wallets</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {FEATURED_WALLETS.map((fw) => (
                 <button
                   key={fw.address}
