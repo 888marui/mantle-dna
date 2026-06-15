@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { mantleMainnet, mantleTestnet } from "@/lib/chains";
 
@@ -10,18 +11,55 @@ export function WalletButton() {
   const { connect, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
+  const [noWalletMsg, setNoWalletMsg] = useState(false);
 
   const isWrongChain = isConnected && chainId !== undefined && !MANTLE_CHAIN_IDS.has(chainId as 5000 | 5003);
 
+  const handleConnect = () => {
+    setNoWalletMsg(false);
+    const connector = connectors[0];
+    if (!connector) {
+      setNoWalletMsg(true);
+      return;
+    }
+    connect(
+      { connector },
+      {
+        onError: (e) => {
+          if (
+            e.message.toLowerCase().includes("not found") ||
+            e.message.toLowerCase().includes("provider") ||
+            e.message.toLowerCase().includes("injected")
+          ) {
+            setNoWalletMsg(true);
+          }
+        },
+      }
+    );
+  };
+
   if (!isConnected) {
     return (
-      <button
-        onClick={() => connect({ connector: connectors[0] })}
-        disabled={isPending}
-        className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
-      >
-        {isPending ? "Connecting..." : "Connect Wallet"}
-      </button>
+      <div className="flex flex-col items-end gap-1">
+        <button
+          onClick={handleConnect}
+          disabled={isPending}
+          className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+        >
+          {isPending ? "Connecting..." : "Connect Wallet"}
+        </button>
+        {noWalletMsg && (
+          <a
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-yellow-500 hover:text-yellow-400 transition-colors whitespace-nowrap"
+            onClick={() => setNoWalletMsg(false)}
+          >
+            ⚠ No wallet found — Install MetaMask ↗
+          </a>
+        )}
+      </div>
     );
   }
 
