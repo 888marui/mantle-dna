@@ -226,6 +226,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
         archetype: archetype.name,
         network,
         tokenBalances,
+        mantleScore: traits.mantleScore,
       }),
     });
 
