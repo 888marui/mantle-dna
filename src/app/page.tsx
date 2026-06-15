@@ -196,12 +196,18 @@ export default function Home() {
               </span>
             </div>
           </div>
-          {blockNumber && (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Block #{blockNumber.toLocaleString()}
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+            {blockNumber && (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Block #{blockNumber.toLocaleString()}
+              </div>
+            )}
+            <nav className="hidden sm:flex items-center gap-3 text-sm text-gray-500">
+              <a href="/compare" className="hover:text-emerald-400 transition-colors">Compare</a>
+              <a href="/about" className="hover:text-emerald-400 transition-colors">About</a>
+            </nav>
+          </div>
           <WalletButton />
         </div>
       </header>
