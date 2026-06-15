@@ -298,7 +298,7 @@ export async function GET(req: NextRequest) {
                 color: color,
                 display: "flex",
               }}>
-                Mantle Score {mantleScore}/100
+                {mantleScore >= 80 ? "💜 Platinum" : mantleScore >= 60 ? "🏆 Gold" : mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze"} · {mantleScore}/100
               </div>
             )}
           </div>
