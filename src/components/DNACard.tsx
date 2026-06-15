@@ -1,7 +1,7 @@
 "use client";
 
 import { type WalletAnalysis, getExplorerUrl } from "@/lib/analyzer";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
 
 import { keccak256, toBytes } from "viem";
@@ -56,6 +56,17 @@ const ARCHETYPE_RARITY: Record<number, string> = {
 export function DNACard({ analysis }: Props) {
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  // Check if DNA has already been minted for this wallet on-chain
+  const { data: existingTokenId } = useReadContract(
+    CONTRACT_DEPLOYED ? {
+      address: WALLET_DNA_ADDRESS,
+      abi: WALLET_DNA_ABI,
+      functionName: "walletToTokenId",
+      args: [analysis.address as `0x${string}`],
+    } : undefined as never
+  );
+  const alreadyMinted = CONTRACT_DEPLOYED && existingTokenId != null && BigInt(existingTokenId) > BigInt(0);
 
   const accentColor = ARCHETYPE_COLORS[analysis.archetype] ?? "#10b981";
 
@@ -319,7 +330,22 @@ export function DNACard({ analysis }: Props) {
       {/* Mint Button */}
       {isSuccess ? (
         <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-sm text-center">
-          🎉 DNA NFT minted to your wallet!
+          🎉 DNA NFT minted! Token #{String(existingTokenId ?? "")} is now on-chain.
+        </div>
+      ) : alreadyMinted ? (
+        <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-900 text-center space-y-1">
+          <div className="text-xs text-emerald-400 font-semibold">✓ DNA Minted On-Chain</div>
+          <div className="text-xs text-gray-500">
+            Token #{String(existingTokenId)} — Soulbound to this wallet forever.
+          </div>
+          <a
+            href={`${getExplorerUrl(analysis.address, analysis.network)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-emerald-600 hover:text-emerald-400 underline underline-offset-2 transition-colors"
+          >
+            View on Explorer ↗
+          </a>
         </div>
       ) : !CONTRACT_DEPLOYED ? (
         <div
