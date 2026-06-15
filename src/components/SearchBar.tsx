@@ -25,6 +25,14 @@ export function SearchBar({ onAnalyze, loading }: Props) {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData("text").trim();
+    if (isAddress(pasted)) {
+      // Defer to next tick so React state updates first
+      setTimeout(() => onAnalyze(pasted, network), 50);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 max-w-2xl mx-auto">
       {/* Network toggle */}
@@ -48,10 +56,11 @@ export function SearchBar({ onAnalyze, loading }: Props) {
         <div className="flex-1 relative">
           <input
             type="text"
-            placeholder="Paste wallet address or press Enter..."
+            placeholder="Paste wallet address — auto-analyzes on paste..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             autoFocus
             className="w-full px-5 py-4 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-600 transition-colors text-sm"
           />

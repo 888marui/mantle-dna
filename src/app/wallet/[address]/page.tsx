@@ -14,6 +14,11 @@ const LOADING_STAGES = [
   "Running AI analysis...",
 ];
 
+const ARCHETYPE_RARITY: Record<number, string> = {
+  0: "12% of wallets", 1: "18% of wallets", 2: "22% of wallets",
+  3: "8% of wallets", 4: "25% of wallets", 5: "3% of wallets", 6: "12% of wallets",
+};
+
 export default function WalletPage({ params }: { params: { address: string } }) {
   const { address } = params;
   const searchParams = useSearchParams();
@@ -138,16 +143,44 @@ export default function WalletPage({ params }: { params: { address: string } }) 
         {/* Results */}
         {analysis && !loading && (
           <div className="space-y-6">
-            {/* Certificate header */}
-            <div className="text-center space-y-1 py-2">
-              <div className="text-xs text-gray-600 uppercase tracking-widest">DNA Certificate</div>
-              <div className="text-xl font-bold text-white">
-                {analysis.archetypeEmoji} {analysis.archetypeName}
-              </div>
-              <div className="text-xs text-gray-500 font-mono">
-                {address.slice(0, 14)}...{address.slice(-12)}
-              </div>
-            </div>
+            {/* Certificate header — styled with archetype color */}
+            {(() => {
+              const ARCHETYPE_COLORS: Record<number, string> = {
+                0: "#f97316", 1: "#06b6d4", 2: "#a855f7", 3: "#22c55e",
+                4: "#10b981", 5: "#3b82f6", 6: "#eab308",
+              };
+              const color = ARCHETYPE_COLORS[analysis.archetype] ?? "#10b981";
+              return (
+                <div className="text-center space-y-2 py-4 relative">
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: `radial-gradient(ellipse 60% 100% at 50% 0%, ${color}12 0%, transparent 70%)` }}
+                  />
+                  <div className="text-xs uppercase tracking-widest" style={{ color: `${color}80` }}>
+                    DNA Certificate · Mantle Network
+                  </div>
+                  <div className="text-3xl font-bold text-white">
+                    {analysis.archetypeEmoji} {analysis.archetypeName}
+                  </div>
+                  <div className="text-xs text-gray-500 font-mono">
+                    {address.slice(0, 14)}...{address.slice(-12)}
+                  </div>
+                  <div className="flex items-center justify-center gap-3 text-xs">
+                    <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>
+                      {ARCHETYPE_RARITY[analysis.archetype] ?? "Rare"}
+                    </span>
+                    <span className="text-gray-600">·</span>
+                    <span className="text-gray-500">
+                      DNA Strength {Math.round((analysis.deFiScore + analysis.holdScore + analysis.diversityScore + analysis.activityScore) / 40)}%
+                    </span>
+                    <span className="text-gray-600">·</span>
+                    <span className="px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
+                      {analysis.network === 'mainnet' ? '🟢 Mainnet' : '🔵 Sepolia'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DNACard analysis={analysis} onMintDNA={() => {}} />
@@ -158,13 +191,27 @@ export default function WalletPage({ params }: { params: { address: string } }) 
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🧬 Just discovered my Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\nmantle-dna.xyz/wallet/${address}${analysis.network === 'mainnet' ? '?network=mainnet' : ''}\n#MantleDNA #Mantle #Web3`
+                  `🧬 My Mantle DNA: ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore} | HODL: ${analysis.holdScore} | Activity: ${analysis.activityScore}\n\n${analysis.aiInsight || analysis.description}\n\nDiscover yours 👇\nmantle-dna.xyz\n#MantleDNA #Mantle #Web3`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-medium border border-gray-700 transition-colors"
               >
                 Share on 𝕏
+              </a>
+              <a
+                href={`/api/og?${new URLSearchParams({
+                  address,
+                  archetype: String(analysis.archetype),
+                  defi: String(analysis.deFiScore),
+                  hodl: String(analysis.holdScore),
+                  diversity: String(analysis.diversityScore),
+                  activity: String(analysis.activityScore),
+                }).toString()}`}
+                download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
+              >
+                ↓ Certificate
               </a>
               <Link
                 href="/"

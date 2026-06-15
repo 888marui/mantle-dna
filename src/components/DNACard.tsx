@@ -241,6 +241,24 @@ export function DNACard({ analysis }: Props) {
         );
       })()}
 
+      {/* Fresh wallet note */}
+      {analysis.archetype === 4 && analysis.txCount < 5 && parseFloat(analysis.mntBalance) < 0.001 && (
+        <div className="px-3 py-2.5 rounded-xl text-xs text-gray-500 leading-relaxed space-y-1"
+          style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
+          <div className="font-medium text-emerald-600">🌱 Early-stage wallet detected</div>
+          <div>
+            No {analysis.network === 'mainnet' ? 'Mantle Mainnet' : 'Sepolia'} activity found yet.
+            Archetype is based on your address fingerprint — it evolves as you transact on Mantle.
+            Try bridging MNT and exploring{" "}
+            <a href="https://agni.finance" target="_blank" rel="noopener noreferrer"
+              className="text-emerald-600 hover:text-emerald-400 underline underline-offset-2 transition-colors">
+              Agni Finance
+            </a>{" "}
+            to reveal your true on-chain DNA.
+          </div>
+        </div>
+      )}
+
       {/* AI Insights Section */}
       {analysis.aiInsight && (
         <div
