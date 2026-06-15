@@ -156,3 +156,14 @@ export async function GET(req: NextRequest, { params }: { params: { address: str
     return NextResponse.json({ error: "Analysis failed", detail: msg }, { status: 500 });
   }
 }
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
