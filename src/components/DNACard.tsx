@@ -58,15 +58,14 @@ export function DNACard({ analysis }: Props) {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   // Check if DNA has already been minted for this wallet on-chain
-  const { data: existingTokenId } = useReadContract(
-    CONTRACT_DEPLOYED ? {
-      address: WALLET_DNA_ADDRESS,
-      abi: WALLET_DNA_ABI,
-      functionName: "walletToTokenId",
-      args: [analysis.address as `0x${string}`],
-    } : undefined as never
-  );
-  const alreadyMinted = CONTRACT_DEPLOYED && existingTokenId != null && BigInt(existingTokenId) > BigInt(0);
+  const { data: existingTokenId } = useReadContract({
+    address: WALLET_DNA_ADDRESS,
+    abi: WALLET_DNA_ABI,
+    functionName: "walletToTokenId",
+    args: [analysis.address as `0x${string}`],
+    query: { enabled: CONTRACT_DEPLOYED },
+  });
+  const alreadyMinted = CONTRACT_DEPLOYED && existingTokenId != null && BigInt(existingTokenId as bigint) > BigInt(0);
 
   const accentColor = ARCHETYPE_COLORS[analysis.archetype] ?? "#10b981";
 
