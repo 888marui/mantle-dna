@@ -113,6 +113,7 @@ export function DNACard({ analysis }: Props) {
         boxShadow: `0 0 0 1px ${accentColor}40, 0 4px 32px ${accentColor}18`,
         background: `linear-gradient(#111827cc, #111827cc) padding-box,
                      linear-gradient(135deg, ${accentColor}60, transparent 50%, ${accentColor}30) border-box`,
+        animation: "fadeSlideIn 0.4s ease-out both",
       }}
     >
       {/* Subtle top-edge glow line */}
@@ -498,16 +499,18 @@ function ScoreBar({ label, desc, value, accentColor }: { label: string; desc: st
           >
             {tier}
           </span>
-          <span className="text-gray-500">{value}</span>
+          <span className="text-gray-500 font-mono">{value}</span>
         </div>
       </div>
       <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-700"
+          className="h-full rounded-full"
           style={{
             width: `${pct}%`,
             background: `linear-gradient(90deg, ${accentColor}aa, ${accentColor})`,
             boxShadow: `0 0 6px ${accentColor}60`,
+            animation: `fillBar 0.9s cubic-bezier(0.4,0,0.2,1) both`,
+            ["--bar-width" as string]: `${pct}%`,
           }}
         />
       </div>
