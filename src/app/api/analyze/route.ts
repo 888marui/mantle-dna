@@ -37,13 +37,13 @@ DNA Scores (0-1000):
 - Activity Score: ${activityScore}/1000 — ${activityScore > 700 ? "highly active on-chain" : activityScore > 400 ? "regularly active" : "occasional user"}
 
 Archetype context:
-- "DeFi Degen": loves risky, high-yield plays; chases APY across protocols; likely yield farming
-- "Diamond Hand HODLer": accumulates and rarely sells; long-term conviction; stacks MNT
-- "Protocol Explorer": tries every new protocol; early adopter; breadth over depth
-- "Yield Farmer": optimizes for sustainable yield; liquidity provider; compounding rewards
-- "NFT Collector": bridges between NFT and DeFi worlds; values digital ownership
-- "Whale": large positions; market-moving potential; measured moves
-- "Newcomer": early in their Web3 journey; building habits; learning the ecosystem
+- "DeFi Degen": High-frequency swaps, yield chasing, protocol hopping; loves risky high-APY plays on Agni Finance and Merchant Moe
+- "Diamond Hands": Accumulates and rarely sells; long-term MNT conviction; likely staking on mETH Protocol
+- "NFT Collector": Bridges NFT and DeFi; active on Mantle NFT marketplace; values digital ownership
+- "Yield Farmer": Optimizes for sustainable yield; LP positions on Agni Finance; compounds rewards via Lendle
+- "Newcomer": Early in Web3 journey; building on-chain habits; first steps into Mantle ecosystem
+- "Whale": Large positions; market-moving potential; strategic moves on Init Capital and Lendle
+- "Trader": Active DEX user on Merchant Moe; sharp timing; reads charts; executes with precision
 
 Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values in your analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
 {

@@ -106,11 +106,29 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     transport: http(MANTLE_RPC),
   });
 
-  const balance = await client.getBalance({ address: address as `0x${string}` });
-  const mntBalance = (Number(balance) / 1e18).toFixed(4);
-  const latestBlock = await client.getBlockNumber();
+  const addr = address as `0x${string}`;
 
-  const traits = computeTraitsFromAddress(address, latestBlock, balance);
+  const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
+    Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error("Mantle RPC timeout — please try again")), ms)
+      ),
+    ]);
+
+  const [balance, txCount, latestBlock] = await withTimeout(
+    Promise.all([
+      client.getBalance({ address: addr }),
+      client.getTransactionCount({ address: addr }).catch(() => null),
+      client.getBlockNumber(),
+    ]),
+    10000
+  );
+
+  const mntBalance = (Number(balance) / 1e18).toFixed(4);
+  const realTxCount = txCount ?? undefined;
+
+  const traits = computeTraitsFromAddress(address, latestBlock, balance, realTxCount);
   const archetype = ARCHETYPES[traits.archetype];
 
   const analysis: WalletAnalysis = {
@@ -163,7 +181,8 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
 function computeTraitsFromAddress(
   address: string,
   latestBlock: bigint,
-  balance: bigint
+  balance: bigint,
+  realTxCount?: number
 ): WalletTraits {
   const bytes = address.toLowerCase().replace("0x", "");
   const seed = (i: number) => parseInt(bytes.slice(i * 2, i * 2 + 4), 16);
@@ -171,18 +190,24 @@ function computeTraitsFromAddress(
   const deFiScore = seed(1) % 1000;
   const holdScore = seed(2) % 1000;
   const diversityScore = seed(3) % 1000;
-  const activityScore = seed(4) % 1000;
-  const txCount = Math.floor(seed(5) / 10);
   const balanceEth = Number(balance) / 1e18;
 
+  // Use real on-chain tx count if available; fall back to deterministic estimate
+  const txCount = realTxCount ?? Math.floor(seed(5) / 10);
+
+  // Activity score: boost for wallets with real tx history
+  const activityScore = realTxCount != null
+    ? Math.min(1000, Math.floor((realTxCount / 500) * 1000) + (seed(4) % 200))
+    : seed(4) % 1000;
+
   let archetype: number;
-  if (balanceEth > 100) archetype = 5;
-  else if (txCount < 10) archetype = 4;
-  else if (deFiScore > 800) archetype = 0;
-  else if (holdScore > 800) archetype = 1;
-  else if (diversityScore > 700 && deFiScore > 500) archetype = 3;
-  else if (activityScore > 750) archetype = 6;
-  else archetype = 2;
+  if (balanceEth > 100) archetype = 5;       // Whale
+  else if (txCount < 5) archetype = 4;        // Newcomer
+  else if (deFiScore > 800) archetype = 0;    // DeFi Degen
+  else if (holdScore > 800) archetype = 1;    // Diamond Hands
+  else if (diversityScore > 700 && deFiScore > 500) archetype = 3; // Yield Farmer
+  else if (activityScore > 750) archetype = 6; // Trader
+  else archetype = 2;                          // NFT Collector
 
   return {
     archetype,
