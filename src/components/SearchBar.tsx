@@ -17,14 +17,22 @@ export function SearchBar({ onAnalyze, loading }: Props) {
     if (isValid) onAnalyze(input);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      setInput("");
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex gap-3 max-w-2xl mx-auto">
       <div className="flex-1 relative">
         <input
           type="text"
-          placeholder="Enter Mantle wallet address (0x...)"
+          placeholder="Paste wallet address or press Enter..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          autoFocus
           className="w-full px-5 py-4 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-600 transition-colors text-sm"
         />
         {input && (

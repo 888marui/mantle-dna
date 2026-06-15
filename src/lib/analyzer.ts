@@ -107,11 +107,23 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
   });
 
   const addr = address as `0x${string}`;
-  const [balance, txCount, latestBlock] = await Promise.all([
-    client.getBalance({ address: addr }),
-    client.getTransactionCount({ address: addr }).catch(() => null),
-    client.getBlockNumber(),
-  ]);
+
+  const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
+    Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error("Mantle RPC timeout — please try again")), ms)
+      ),
+    ]);
+
+  const [balance, txCount, latestBlock] = await withTimeout(
+    Promise.all([
+      client.getBalance({ address: addr }),
+      client.getTransactionCount({ address: addr }).catch(() => null),
+      client.getBlockNumber(),
+    ]),
+    10000
+  );
 
   const mntBalance = (Number(balance) / 1e18).toFixed(4);
   const realTxCount = txCount ?? undefined;
