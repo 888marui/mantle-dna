@@ -149,6 +149,9 @@ export function DNACard({ analysis }: Props) {
           <div className="text-xs text-gray-500 font-mono mt-1">
             {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
           </div>
+          <div className="text-xs text-gray-600 mt-0.5">
+            First seen ~block #{analysis.firstSeenBlock.toLocaleString()}
+          </div>
         </div>
       </div>
 
@@ -261,9 +264,22 @@ export function DNACard({ analysis }: Props) {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <StatBadge label="Transactions" value={analysis.txCount.toString()} accentColor={accentColor} />
         <StatBadge label="MNT Balance" value={`${analysis.mntBalance} MNT`} accentColor={accentColor} />
+        <a
+          href={`https://explorer.sepolia.mantle.xyz/address/${analysis.address}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-3 rounded-xl flex flex-col justify-between transition-all hover:opacity-80"
+          style={{
+            background: "rgba(31,41,55,0.6)",
+            border: `1px solid ${accentColor}25`,
+          }}
+        >
+          <div className="text-xs text-gray-500 mb-1">Explorer</div>
+          <div className="text-sm font-semibold" style={{ color: accentColor }}>View ↗</div>
+        </a>
       </div>
 
       {/* Score Bars */}
