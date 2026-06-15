@@ -175,7 +175,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
                     </span>
                     <span className="text-gray-600">·</span>
                     <span className="px-2 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>
-                      Mantle Score {analysis.mantleScore}/100
+                      {analysis.mantleScore >= 80 ? "💜 Platinum" : analysis.mantleScore >= 60 ? "🏆 Gold" : analysis.mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze"} · {analysis.mantleScore}/100
                     </span>
                     <span className="text-gray-600">·</span>
                     <span className="px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
