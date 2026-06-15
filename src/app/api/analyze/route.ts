@@ -62,7 +62,7 @@ Write a DNA profile for this ${archetype}. The tone is insightful and a bit chee
   "insight": "2 punchy sentences that capture their Web3 personality based on their specific scores. Reference actual numbers. Be insightful and a bit cheeky.",
   "strengths": ["3 specific on-chain skills this wallet excels at based on their score pattern — e.g. 'Liquidity timing', 'Protocol risk assessment', 'MNT accumulation discipline'"],
   "watchOut": "One specific DeFi risk they face given their archetype and score pattern on Mantle — be concrete, not generic",
-  "prediction": "One bold prediction about their next move in the Mantle ecosystem. Mention specific protocols like Agni Finance, Merchant Moe, Lendle, mETH Protocol, or Init Capital where relevant."
+  "prediction": "One bold prediction about their next move in the Mantle ecosystem. Must mention a specific Mantle protocol: Agni Finance, Merchant Moe, Lendle, mETH Protocol, Init Capital, FBTC, or Mantle Bridge."
 }`;
 
     const message = await client.messages.create({

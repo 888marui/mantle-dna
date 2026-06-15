@@ -162,6 +162,8 @@ export async function GET(req: NextRequest) {
   const hodl = Number(searchParams.get("hodl") ?? computed.holdScore);
   const diversity = Number(searchParams.get("diversity") ?? computed.diversityScore);
   const activity = Number(searchParams.get("activity") ?? computed.activityScore);
+  const network = searchParams.get("network") ?? "mainnet";
+  const mantleScore = Number(searchParams.get("mantleScore") ?? 0);
 
   const shortAddr = `${address.slice(0, 10)}...${address.slice(-8)}`;
   const totalPct = Math.round((defi + hodl + diversity + activity) / 40);
@@ -270,8 +272,34 @@ export async function GET(req: NextRequest) {
             {name}
           </div>
 
-          <div style={{ fontSize: "17px", color: "#4b5563", fontFamily: "monospace" }}>
-            {shortAddr}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{ fontSize: "17px", color: "#4b5563", fontFamily: "monospace" }}>
+              {shortAddr}
+            </div>
+            <div style={{
+              fontSize: "12px",
+              padding: "3px 10px",
+              borderRadius: "999px",
+              background: network === "mainnet" ? "rgba(16,185,129,0.15)" : "rgba(59,130,246,0.15)",
+              border: `1px solid ${network === "mainnet" ? "rgba(16,185,129,0.4)" : "rgba(59,130,246,0.4)"}`,
+              color: network === "mainnet" ? "#10b981" : "#3b82f6",
+              display: "flex",
+            }}>
+              {network === "mainnet" ? "🟢 Mainnet" : "🔵 Sepolia"}
+            </div>
+            {mantleScore > 0 && (
+              <div style={{
+                fontSize: "12px",
+                padding: "3px 10px",
+                borderRadius: "999px",
+                background: `${color}18`,
+                border: `1px solid ${color}40`,
+                color: color,
+                display: "flex",
+              }}>
+                Mantle Score {mantleScore}/100
+              </div>
+            )}
           </div>
 
           {/* DNA Strength bar */}

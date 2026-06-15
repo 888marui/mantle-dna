@@ -13,6 +13,7 @@ export interface WalletTraits {
   activityScore: number;
   firstSeenBlock: number;
   analyzedAt: number;
+  mantleScore: number;
 }
 
 export interface WalletAnalysis extends WalletTraits {
@@ -29,6 +30,7 @@ export interface WalletAnalysis extends WalletTraits {
   aiPrediction?: string;
   protocolAffinity: string[];
   tokenBalances?: Record<string, string>;  // Real ERC-20 balances from Mantle
+  mantleScore: number;  // 0-100 Mantle ecosystem engagement score
 }
 
 const ERC20_ABI = [
@@ -46,6 +48,7 @@ const MAINNET_TOKENS: Array<{ symbol: string; address: `0x${string}`; decimals: 
   { symbol: "USDT", address: "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE", decimals: 6 },
   { symbol: "USDC", address: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9", decimals: 6 },
   { symbol: "mETH", address: "0xcDA86A272531e8640cD7F1a92c01839911B90bb0", decimals: 18 },
+  { symbol: "WMNT", address: "0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8", decimals: 18 },
 ];
 
 const ARCHETYPES = [
@@ -266,6 +269,7 @@ function computeTraitsFromAddress(
 
   // Apply real token data to adjust scores (mainnet only — tokenBalances empty on Sepolia)
   const mEthBalance = parseFloat(tokenBalances.mETH || "0");
+  const wmntBalance = parseFloat(tokenBalances.WMNT || "0");
   const stableBalance = parseFloat(tokenBalances.USDT || "0") + parseFloat(tokenBalances.USDC || "0");
   const tokenCount = Object.keys(tokenBalances).length;
 
@@ -273,6 +277,11 @@ function computeTraitsFromAddress(
     // mETH staking → HODLing behavior + DeFi participation
     holdScore = clamp(holdScore + Math.min(200, Math.floor(mEthBalance * 10)));
     deFiScore = clamp(deFiScore + Math.min(100, Math.floor(mEthBalance * 5)));
+  }
+  if (wmntBalance > 0) {
+    // WMNT (wrapped MNT) → active DeFi user + protocol participant
+    deFiScore = clamp(deFiScore + Math.min(150, Math.floor(wmntBalance * 5)));
+    diversityScore = clamp(diversityScore + Math.min(100, Math.floor(wmntBalance * 3)));
   }
   if (stableBalance > 0) {
     // Stablecoin holdings → active trading/yield farming
@@ -320,6 +329,18 @@ function computeTraitsFromAddress(
     archetypeReason = `Balanced profile: DeFi ${deFiScore}, HODLing ${holdScore}, Diversity ${diversityScore} → NFT Collector`;
   }
 
+  // Mantle Ecosystem Score: 0-100, based on real on-chain engagement
+  let mantleScore = 0;
+  if (balanceEth > 0.001) mantleScore += 20;
+  if (balanceEth > 1) mantleScore += 10;
+  if (mEthBalance > 0) mantleScore += 20;
+  if (stableBalance > 0) mantleScore += 15;
+  if (wmntBalance > 0) mantleScore += 10;
+  if (txCount > 5) mantleScore += 10;
+  if (txCount > 20) mantleScore += 10;
+  if (tokenCount >= 2) mantleScore += 5;
+  mantleScore = Math.min(100, mantleScore);
+
   return {
     archetype,
     archetypeReason,
@@ -330,6 +351,7 @@ function computeTraitsFromAddress(
     activityScore,
     firstSeenBlock: Number(latestBlock) - Math.floor(seed(6) / 2),
     analyzedAt: Math.floor(Date.now() / 1000),
+    mantleScore,
   };
 }
 
