@@ -21,6 +21,7 @@ export interface WalletAnalysis extends WalletTraits {
   description: string;
   mntBalance: string;
   address: string;
+  network: NetworkType;
   aiInsight?: string;
   aiStrengths?: string[];
   aiWatchOut?: string;
@@ -152,6 +153,7 @@ export async function analyzeWallet(address: string, network: NetworkType = 'sep
     description: archetype.description,
     mntBalance,
     address,
+    network,
     protocolAffinity: computeProtocolAffinity(traits.archetype, traits.deFiScore, traits.holdScore, traits.diversityScore),
   };
 

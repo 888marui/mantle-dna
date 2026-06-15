@@ -1,6 +1,6 @@
 "use client";
 
-import { type WalletAnalysis } from "@/lib/analyzer";
+import { type WalletAnalysis, getExplorerUrl } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
 
@@ -156,12 +156,15 @@ export function DNACard({ analysis }: Props) {
             DNA Archetype
           </div>
           <div className="text-2xl font-bold text-white">{analysis.archetypeName}</div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
             <span
               className="text-xs px-1.5 py-0.5 rounded-full"
               style={{ background: `${accentColor}20`, color: accentColor }}
             >
               Top {ARCHETYPE_RARITY[analysis.archetype] ?? "rare"}
+            </span>
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-500 border border-gray-700">
+              {analysis.network === 'mainnet' ? '🟢 Mainnet' : '🔵 Sepolia'}
             </span>
           </div>
           <div className="text-xs text-gray-500 font-mono mt-1">
@@ -289,7 +292,7 @@ export function DNACard({ analysis }: Props) {
         <StatBadge label="Transactions" value={analysis.txCount.toString()} accentColor={accentColor} />
         <StatBadge label="MNT Balance" value={`${analysis.mntBalance} MNT`} accentColor={accentColor} />
         <a
-          href={`https://explorer.sepolia.mantle.xyz/address/${analysis.address}`}
+          href={getExplorerUrl(analysis.address, analysis.network)}
           target="_blank"
           rel="noopener noreferrer"
           className="p-3 rounded-xl flex flex-col justify-between transition-all hover:opacity-80"

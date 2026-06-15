@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { analyzeWallet, type WalletAnalysis } from "@/lib/analyzer";
+import { useSearchParams } from "next/navigation";
+import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/analyzer";
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { WalletButton } from "@/components/WalletButton";
@@ -9,6 +10,8 @@ import Link from "next/link";
 
 export default function WalletPage({ params }: { params: { address: string } }) {
   const { address } = params;
+  const searchParams = useSearchParams();
+  const network: NetworkType = searchParams.get('network') === 'mainnet' ? 'mainnet' : 'sepolia';
   const [analysis, setAnalysis] = useState<WalletAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +20,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
     if (!address) return;
     setLoading(true);
     setError(null);
-    analyzeWallet(address)
+    analyzeWallet(address, network)
       .then((result) => {
         setAnalysis(result);
       })
@@ -27,7 +30,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
       .finally(() => {
         setLoading(false);
       });
-  }, [address]);
+  }, [address, network]);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
@@ -88,7 +91,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
             <div className="flex justify-center">
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🧬 Just discovered my Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\nmantle-dna.xyz/wallet/${address}\n#MantleDNA #Mantle #Web3`
+                  `🧬 Just discovered my Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\nmantle-dna.xyz/wallet/${address}${analysis.network === 'mainnet' ? '?network=mainnet' : ''}\n#MantleDNA #Mantle #Web3`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
