@@ -53,12 +53,18 @@ contract WalletDNA is ERC721, ERC721URIStorage, Ownable {
         emit AnalyzerUpdated(_analyzer);
     }
 
-    /// @notice Mint a DNA NFT for a wallet based on off-chain analysis results
+    /// @notice Mint a DNA NFT for a wallet.
+    /// @dev Callers: (1) wallet mints its own DNA (self-mint), or
+    ///              (2) authorized analyzer/owner mints on behalf of a wallet.
     function mintDNA(
         address _wallet,
         string calldata _tokenURI,
         DNATraits calldata _traits
-    ) external onlyAnalyzer {
+    ) external {
+        require(
+            msg.sender == _wallet || msg.sender == analyzer || msg.sender == owner(),
+            "Not authorized: must be wallet owner, analyzer, or contract owner"
+        );
         require(walletToTokenId[_wallet] == 0, "DNA already minted for this wallet");
 
         _nextTokenId++;
