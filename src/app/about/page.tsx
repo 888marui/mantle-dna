@@ -192,7 +192,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">⚡ Technical Depth (30%)</div>
-              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract</div>
+              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract · 3× public REST APIs (wallet, compare, batch) with CORS + caching</div>
             </div>
             <div className="space-y-0.5">
               <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
