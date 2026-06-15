@@ -130,13 +130,25 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-2">
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-3">
           <div className="text-sm font-semibold text-emerald-400">Built for Mantle Turing Test Hackathon 2026</div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
-            <div>⚡ Technical Depth — AI + RPC + SBT + OG</div>
-            <div>💡 Innovation — DNA metaphor + social sharing</div>
-            <div>🔗 Mantle Ecosystem — 8 protocol integrations</div>
-            <div>✅ Product Complete — end-to-end working flow</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">⚡ Technical Depth (30%)</div>
+              <div className="text-gray-600">4× live ERC-20 balances (USDT/USDC/mETH/WMNT) · Claude Haiku AI · keccak256 on-chain AI hash · Edge OG images · Hardhat SBT contract</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">💡 Innovation (25%)</div>
+              <div className="text-gray-600">DNA metaphor + ATCG visualization · DNA Evolution Path showing next archetype · Mantle Ecosystem Score (0-100) · Achievement badges · Farcaster sharing</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">🔗 Mantle Ecosystem (25%)</div>
+              <div className="text-gray-600">8 protocol integrations with direct links · WMNT + mETH live tracking · Protocol affinity per archetype · Evolution Path with protocol action cards</div>
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-gray-300 font-medium">✅ Product Complete (20%)</div>
+              <div className="text-gray-600">Analyze → AI insight → visualize → share (𝕏 + Farcaster) → certificate → mint SBT · Auto-analyze on paste/connect · Dual-network support</div>
+            </div>
           </div>
         </div>
       </div>
