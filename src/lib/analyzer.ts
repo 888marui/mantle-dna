@@ -1,5 +1,7 @@
 import { createPublicClient, http } from "viem";
-import { mantleTestnet } from "./chains";
+import { mantleMainnet, mantleTestnet } from "./chains";
+
+export type NetworkType = 'mainnet' | 'sepolia';
 
 export interface WalletTraits {
   archetype: number;
@@ -98,12 +100,23 @@ function computeProtocolAffinity(
   return protocols;
 }
 
-const MANTLE_RPC = process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz";
+export function getExplorerUrl(address: string, network: NetworkType = 'sepolia'): string {
+  const base = network === 'mainnet'
+    ? 'https://explorer.mantle.xyz'
+    : 'https://explorer.sepolia.mantle.xyz';
+  return `${base}/address/${address}`;
+}
 
-export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
+export async function analyzeWallet(address: string, network: NetworkType = 'sepolia'): Promise<WalletAnalysis> {
+  const rpcUrl = network === 'mainnet'
+    ? (process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz")
+    : (process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz");
+
+  const chain = network === 'mainnet' ? mantleMainnet : mantleTestnet;
+
   const client = createPublicClient({
-    chain: mantleTestnet,
-    transport: http(MANTLE_RPC),
+    chain,
+    transport: http(rpcUrl),
   });
 
   const addr = address as `0x${string}`;

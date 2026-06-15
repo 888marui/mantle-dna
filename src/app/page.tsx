@@ -3,7 +3,7 @@
 import { useAccount } from "wagmi";
 import { WalletButton } from "@/components/WalletButton";
 import { useState, useEffect } from "react";
-import { analyzeWallet, type WalletAnalysis } from "@/lib/analyzer";
+import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/analyzer";
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { SearchBar } from "@/components/SearchBar";
@@ -110,12 +110,12 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  const handleAnalyze = async (walletAddress: string) => {
+  const handleAnalyze = async (walletAddress: string, network: NetworkType = 'sepolia') => {
     setLoading(true);
     setError(null);
     setAnalysis(null);
     try {
-      const result = await analyzeWallet(walletAddress);
+      const result = await analyzeWallet(walletAddress, network);
       setAnalysis(result);
       saveRecent(result);
       setRecentAnalyses(loadRecent());
@@ -127,7 +127,7 @@ export default function Home() {
   };
 
   const handleAnalyzeSelf = () => {
-    if (address) handleAnalyze(address);
+    if (address) handleAnalyze(address, 'sepolia');
   };
 
   return (
