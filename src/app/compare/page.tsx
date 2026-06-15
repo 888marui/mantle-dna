@@ -289,6 +289,7 @@ export default function ComparePage() {
   const [errorA, setErrorA] = useState<string | null>(null);
   const [errorB, setErrorB] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const analyzeA = useCallback(async (addr?: string, net?: NetworkType) => {
     const a = addr ?? addrA;
@@ -519,13 +520,29 @@ export default function ComparePage() {
                   >
                     ⬡ Farcaster
                   </a>
-                  <a
-                    href={ogCompareUrl}
-                    download={`mantle-dna-compare-${addrA.slice(0, 6)}-${addrB.slice(0, 6)}.png`}
-                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-400 hover:text-gray-300 transition-colors"
+                  <button
+                    onClick={async () => {
+                      setIsDownloading(true);
+                      try {
+                        const res = await fetch(ogCompareUrl);
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `mantle-dna-compare-${addrA.slice(0, 6)}-${addrB.slice(0, 6)}.png`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      } catch {
+                        window.open(ogCompareUrl, "_blank");
+                      } finally {
+                        setIsDownloading(false);
+                      }
+                    }}
+                    disabled={isDownloading}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-50"
                   >
-                    ↓ Download
-                  </a>
+                    {isDownloading ? "Preparing..." : "↓ Download"}
+                  </button>
                 </>
               );
             })()}

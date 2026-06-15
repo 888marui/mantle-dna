@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { isAddress } from "viem";
 import { type NetworkType } from "@/lib/analyzer";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 interface Props {
   onAnalyze: (address: string, network: NetworkType) => void;
@@ -12,6 +14,7 @@ interface Props {
 export function SearchBar({ onAnalyze, loading }: Props) {
   const [input, setInput] = useState("");
   const [network, setNetwork] = useState<NetworkType>('mainnet');
+  const { lang } = useLanguage();
   const isValid = isAddress(input);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,7 +59,7 @@ export function SearchBar({ onAnalyze, loading }: Props) {
         <div className="flex-1 relative">
           <input
             type="text"
-            placeholder="Paste wallet address — auto-analyzes on paste..."
+            placeholder={t(lang, "search_placeholder")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -73,7 +76,7 @@ export function SearchBar({ onAnalyze, loading }: Props) {
           disabled={!isValid || loading}
           className="px-6 py-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
         >
-          {loading ? "Analyzing..." : "Analyze DNA"}
+          {loading ? `${t(lang, "loading_1").split("...")[0]}...` : t(lang, "search_button")}
         </button>
       </form>
     </div>

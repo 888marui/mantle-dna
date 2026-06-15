@@ -397,10 +397,6 @@ export async function GET(req: NextRequest) {
     {
       width: 1200,
       height: 630,
-      headers: isDownload ? {
-        "Content-Disposition": `attachment; filename="mantle-dna-${archetype.name.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png"`,
-        "Content-Type": "image/png",
-      } : undefined,
     }
   );
 }

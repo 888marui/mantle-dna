@@ -7,6 +7,8 @@ import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
 
 import { keccak256, toBytes } from "viem";
 import { ShareButton } from "@/components/ShareButton";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
 
@@ -46,13 +48,6 @@ interface Props {
   analysis: WalletAnalysis;
   onMintDNA: () => void;
 }
-
-const SCORE_LABELS: Record<string, { label: string; desc: string }> = {
-  deFiScore: { label: "DeFi Engagement", desc: "Protocol swap frequency, yield activity, and DeFi contract interactions" },
-  holdScore: { label: "HODLing", desc: "Long-term holding behavior, accumulation patterns, low sell frequency" },
-  diversityScore: { label: "Protocol Diversity", desc: "Range of DeFi protocols used across Mantle ecosystem" },
-  activityScore: { label: "On-chain Activity", desc: "Transaction volume, recency, and consistency of on-chain actions" },
-};
 
 /** Primary accent color per archetype index */
 const ARCHETYPE_COLORS: Record<number, string> = {
@@ -179,6 +174,8 @@ function getEvolution(analysis: WalletAnalysis): EvolutionData {
 
 export function DNACard({ analysis }: Props) {
   const [addrCopied, setAddrCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { lang } = useLanguage();
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
@@ -225,6 +222,34 @@ export function DNACard({ analysis }: Props) {
         },
       ],
     });
+  };
+
+  const handleDownloadCert = async () => {
+    setIsDownloading(true);
+    try {
+      const params = new URLSearchParams({
+        address: analysis.address,
+        archetype: String(analysis.archetype),
+        defi: String(analysis.deFiScore),
+        hodl: String(analysis.holdScore),
+        diversity: String(analysis.diversityScore),
+        activity: String(analysis.activityScore),
+        network: analysis.network,
+        mantleScore: String(analysis.mantleScore),
+      });
+      const res = await fetch(`/api/og?${params}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${analysis.address.slice(0, 8)}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(`/api/og?address=${analysis.address}`, "_blank");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -289,7 +314,7 @@ export function DNACard({ analysis }: Props) {
             className="text-xs font-medium uppercase tracking-wider mb-1"
             style={{ color: accentColor }}
           >
-            DNA Archetype
+            {t(lang, "dna_archetype")}
           </div>
           <div className="text-2xl font-bold text-white">{analysis.archetypeName}</div>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -328,17 +353,6 @@ export function DNACard({ analysis }: Props) {
       {/* Description */}
       <p className="text-sm text-gray-400 leading-relaxed">{analysis.description}</p>
 
-      {/* Archetype classification reason */}
-      <div
-        className="px-3 py-2 rounded-lg text-[11px] font-mono text-gray-600 leading-relaxed"
-        style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
-      >
-        <span className="text-gray-700">›</span> {analysis.archetypeReason}
-        {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
-          <span className="ml-2 text-emerald-700">· adjusted by real token data</span>
-        )}
-      </div>
-
       {/* Total DNA Score */}
       {(() => {
         const totalPct = Math.round(
@@ -347,7 +361,7 @@ export function DNACard({ analysis }: Props) {
         return (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-400 font-medium uppercase tracking-wider">DNA Strength</span>
+              <span className="text-gray-400 font-medium uppercase tracking-wider">{t(lang, "dna_strength")}</span>
               <span className="font-bold text-sm" style={{ color: accentColor }}>{totalPct}%</span>
             </div>
             <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
@@ -367,7 +381,7 @@ export function DNACard({ analysis }: Props) {
       {/* Mantle Ecosystem Score */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400 font-medium uppercase tracking-wider">Mantle Ecosystem Score</span>
+          <span className="text-gray-400 font-medium uppercase tracking-wider">{t(lang, "mantle_score")}</span>
           <div className="flex items-center gap-2">
             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
               style={{
@@ -382,9 +396,9 @@ export function DNACard({ analysis }: Props) {
                                      analysis.mantleScore >= 30 ? "rgba(156,163,175,0.3)" : "rgba(120,113,108,0.3)"}`,
               }}
             >
-              {analysis.mantleScore >= 80 ? "💜 Platinum" :
-               analysis.mantleScore >= 60 ? "🏆 Gold" :
-               analysis.mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze"}
+              {analysis.mantleScore >= 80 ? t(lang, "tier_platinum") :
+               analysis.mantleScore >= 60 ? t(lang, "tier_gold") :
+               analysis.mantleScore >= 30 ? t(lang, "tier_silver") : t(lang, "tier_bronze")}
             </span>
             <span className="font-bold text-sm" style={{ color: accentColor }}>{analysis.mantleScore}/100</span>
           </div>
@@ -401,12 +415,12 @@ export function DNACard({ analysis }: Props) {
         </div>
         <div className="flex gap-2 flex-wrap">
           {[
-            analysis.mantleScore >= 20 && { label: "MNT Holder" },
-            parseFloat(analysis.mntBalance) >= 1 && { label: "MNT Whale" },
-            analysis.tokenBalances?.mETH && { label: "mETH Staker" },
-            (analysis.tokenBalances?.USDT || analysis.tokenBalances?.USDC) && { label: "Stable User" },
-            analysis.tokenBalances?.WMNT && { label: "DeFi Active" },
-            analysis.txCount > 5 && { label: "On-chain Veteran" },
+            analysis.mantleScore >= 20 && { label: t(lang, "badge_mnt") },
+            parseFloat(analysis.mntBalance) >= 1 && { label: t(lang, "badge_whale") },
+            analysis.tokenBalances?.mETH && { label: t(lang, "badge_meth") },
+            (analysis.tokenBalances?.USDT || analysis.tokenBalances?.USDC) && { label: t(lang, "badge_stable") },
+            analysis.tokenBalances?.WMNT && { label: t(lang, "badge_defi") },
+            analysis.txCount > 5 && { label: t(lang, "badge_veteran") },
           ].filter(Boolean).map((badge) => (
             <span
               key={(badge as { label: string }).label}
@@ -421,19 +435,16 @@ export function DNACard({ analysis }: Props) {
 
       {/* Fresh wallet note */}
       {analysis.archetype === 4 && analysis.txCount < 5 && parseFloat(analysis.mntBalance) < 0.001 && (
-        <div className="px-3 py-2.5 rounded-xl text-xs text-gray-500 leading-relaxed space-y-1"
+        <div className="px-3 py-2 rounded-xl text-xs text-gray-500"
           style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
-          <div className="font-medium text-emerald-600">🌱 Early-stage wallet detected</div>
-          <div>
-            No {analysis.network === 'mainnet' ? 'Mantle Mainnet' : 'Sepolia'} activity found yet.
-            Archetype is based on your address fingerprint — it evolves as you transact on Mantle.
-            Try bridging MNT and exploring{" "}
-            <a href="https://agni.finance" target="_blank" rel="noopener noreferrer"
-              className="text-emerald-600 hover:text-emerald-400 underline underline-offset-2 transition-colors">
-              Agni Finance
-            </a>{" "}
-            to reveal your true on-chain DNA.
-          </div>
+          <span className="font-medium text-emerald-600">{t(lang, "early_stage")}</span>
+          {" — "}
+          <a href="https://agni.finance" target="_blank" rel="noopener noreferrer"
+            className="text-emerald-600 hover:text-emerald-400 underline underline-offset-2 transition-colors">
+            Agni Finance
+          </a>
+          {" "}
+          {lang === "ja" ? "でDNAを育てよう。" : "to grow your DNA."}
         </div>
       )}
 
@@ -453,16 +464,16 @@ export function DNACard({ analysis }: Props) {
                 className="text-xs font-semibold uppercase tracking-wider"
                 style={{ color: accentColor }}
               >
-                AI Analysis
+                {t(lang, "ai_analysis")}
               </span>
             </div>
-            <span className="text-[10px] text-gray-600 font-mono">powered by Claude</span>
+            <span className="text-[10px] text-gray-600 font-mono">{t(lang, "powered_by")}</span>
           </div>
           <p className="text-sm text-gray-300 leading-relaxed">{analysis.aiInsight}</p>
 
           {analysis.aiStrengths && analysis.aiStrengths.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Strengths</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider">{t(lang, "strengths")}</div>
               <div className="flex flex-wrap gap-2">
                 {analysis.aiStrengths.map((s) => (
                   <span
@@ -483,14 +494,14 @@ export function DNACard({ analysis }: Props) {
 
           {analysis.aiWatchOut && (
             <div className="space-y-1">
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Watch Out</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider">{t(lang, "watch_out")}</div>
               <p className="text-xs text-yellow-400/80 leading-relaxed">⚠️ {analysis.aiWatchOut}</p>
             </div>
           )}
 
           {analysis.aiPrediction && (
             <div className="space-y-1">
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Prediction</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider">{t(lang, "prediction")}</div>
               <p className="text-xs text-blue-400/80 leading-relaxed">🔮 {analysis.aiPrediction}</p>
             </div>
           )}
@@ -506,8 +517,8 @@ export function DNACard({ analysis }: Props) {
             style={{ background: "rgba(17,24,39,0.8)", border: "1px solid rgba(55,65,81,0.5)" }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">DNA Evolution Path</span>
-              <span className="text-[10px] text-gray-700">Mantle Protocol Actions</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t(lang, "evolution_path")}</span>
+              <span className="text-[10px] text-gray-700">{t(lang, "evolution_actions")}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <div className="flex items-center gap-1.5 text-gray-400">
@@ -564,7 +575,7 @@ export function DNACard({ analysis }: Props) {
 
       {/* Protocol Affinity */}
       <div className="space-y-2">
-        <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Protocol Match</div>
+        <div className="text-xs text-gray-500 uppercase tracking-wider">{t(lang, "protocol_match")}</div>
         <div className="space-y-1.5">
           {analysis.protocolAffinity.map((protocol) => {
             const match = protocolMatchScore(protocol, analysis.deFiScore, analysis.holdScore, analysis.diversityScore, analysis.activityScore);
@@ -600,8 +611,8 @@ export function DNACard({ analysis }: Props) {
 
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
-        <StatBadge label="Transactions" value={analysis.txCount.toString()} accentColor={accentColor} />
-        <StatBadge label="MNT Balance" value={`${analysis.mntBalance} MNT`} accentColor={accentColor} />
+        <StatBadge label={t(lang, "transactions")} value={analysis.txCount.toString()} accentColor={accentColor} />
+        <StatBadge label={t(lang, "mnt_balance")} value={`${analysis.mntBalance} MNT`} accentColor={accentColor} />
         <a
           href={getExplorerUrl(analysis.address, analysis.network)}
           target="_blank"
@@ -612,8 +623,8 @@ export function DNACard({ analysis }: Props) {
             border: `1px solid ${accentColor}25`,
           }}
         >
-          <div className="text-xs text-gray-500 mb-1">Explorer</div>
-          <div className="text-sm font-semibold" style={{ color: accentColor }}>View ↗</div>
+          <div className="text-xs text-gray-500 mb-1">{t(lang, "explorer")}</div>
+          <div className="text-sm font-semibold" style={{ color: accentColor }}>{t(lang, "view")}</div>
         </a>
       </div>
 
@@ -621,9 +632,9 @@ export function DNACard({ analysis }: Props) {
       {analysis.tokenBalances && Object.keys(analysis.tokenBalances).length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="text-xs text-gray-500 uppercase tracking-wider">Real Token Holdings</div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider">{t(lang, "real_tokens")}</div>
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-500 border border-emerald-900">
-              live on-chain
+              {t(lang, "live_onchain")}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -646,57 +657,49 @@ export function DNACard({ analysis }: Props) {
 
       {/* Score Bars */}
       <div className="space-y-3">
-        {scores.map(({ key, value }) => (
-          <ScoreBar
-            key={key}
-            label={SCORE_LABELS[key].label}
-            desc={SCORE_LABELS[key].desc}
-            value={value}
-            accentColor={accentColor}
-          />
-        ))}
+        {scores.map(({ key, value }) => {
+          const labelKey = key === "deFiScore" ? "score_defi" :
+                          key === "holdScore" ? "score_hodl" :
+                          key === "diversityScore" ? "score_diversity" : "score_activity";
+          return (
+            <ScoreBar
+              key={key}
+              label={t(lang, labelKey as Parameters<typeof t>[1])}
+              value={value}
+              accentColor={accentColor}
+            />
+          );
+        })}
       </div>
 
       {/* Share + Download row */}
       <div className="space-y-2">
         <ShareButton analysis={analysis} />
-        <a
-          href={`/api/og?${new URLSearchParams({
-            address: analysis.address,
-            archetype: String(analysis.archetype),
-            defi: String(analysis.deFiScore),
-            hodl: String(analysis.holdScore),
-            diversity: String(analysis.diversityScore),
-            activity: String(analysis.activityScore),
-            network: analysis.network,
-            mantleScore: String(analysis.mantleScore),
-            download: "1",
-          }).toString()}`}
-          download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${analysis.address.slice(0, 8)}.png`}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-600 text-xs font-medium transition-colors"
+        <button
+          onClick={handleDownloadCert}
+          disabled={isDownloading}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-600 text-xs font-medium transition-colors disabled:opacity-50"
         >
-          ↓ Download DNA Certificate (1200×630)
-        </a>
+          {isDownloading ? t(lang, "downloading") : t(lang, "download_cert")}
+        </button>
       </div>
 
       {/* Mint Button */}
       {isSuccess ? (
         <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-800 text-emerald-400 text-sm text-center">
-          🎉 DNA NFT minted! Token #{String(existingTokenId ?? "")} is now on-chain.
+          {t(lang, "minted_success")} Token #{String(existingTokenId ?? "")}
         </div>
       ) : alreadyMinted ? (
         <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-900 text-center space-y-1">
-          <div className="text-xs text-emerald-400 font-semibold">✓ DNA Minted On-Chain</div>
-          <div className="text-xs text-gray-500">
-            Token #{String(existingTokenId)} — Soulbound to this wallet forever.
-          </div>
+          <div className="text-xs text-emerald-400 font-semibold">{t(lang, "already_minted")}</div>
+          <div className="text-xs text-gray-500">Token #{String(existingTokenId)}</div>
           <a
             href={`${getExplorerUrl(analysis.address, analysis.network)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-emerald-600 hover:text-emerald-400 underline underline-offset-2 transition-colors"
           >
-            View on Explorer ↗
+            {t(lang, "view_explorer")}
           </a>
         </div>
       ) : !CONTRACT_DEPLOYED ? (
@@ -706,18 +709,17 @@ export function DNACard({ analysis }: Props) {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentColor }}>
-              Soulbound NFT
+              {t(lang, "deploying_title")}
             </span>
             <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">
-              Deploying to Mantle Sepolia
+              Mantle Sepolia
             </span>
           </div>
           <p className="text-xs text-gray-500 leading-relaxed">
-            Your {analysis.archetypeName} DNA will be minted as a non-transferable ERC-721 token —
-            your permanent on-chain identity on Mantle Network.
+            {t(lang, "deploying_desc")}
           </p>
           <div className="flex gap-2 flex-wrap">
-            {["Non-transferable", "On-chain traits", "AI hash verified"].map((trait) => (
+            {([t(lang, "nft_feature_1"), t(lang, "nft_feature_2"), t(lang, "nft_feature_3")]).map((trait) => (
               <span
                 key={trait}
                 className="text-xs px-2 py-0.5 rounded-full"
@@ -738,12 +740,12 @@ export function DNACard({ analysis }: Props) {
             boxShadow: `0 0 16px ${accentColor}40`,
           }}
         >
-          {isPending || isConfirming ? "Minting..." : "Mint DNA as Soulbound NFT"}
+          {isPending || isConfirming ? t(lang, "minting") : t(lang, "mint_nft")}
         </button>
       )}
 
       <p className="text-xs text-gray-600 text-center">
-        Soulbound — non-transferable proof of your on-chain identity
+        {t(lang, "soulbound_note")}
       </p>
     </div>
   );
@@ -771,17 +773,14 @@ function scoreTier(v: number): string {
   return "Growing";
 }
 
-function ScoreBar({ label, desc, value, accentColor }: { label: string; desc: string; value: number; accentColor: string }) {
+function ScoreBar({ label, value, accentColor }: { label: string; value: number; accentColor: string }) {
   const pct = Math.round(value / 10);
   const tier = scoreTier(value);
 
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-xs">
-        <div>
-          <span className="text-gray-400">{label}</span>
-          <div className="text-[10px] text-gray-600 mt-0.5 leading-tight max-w-[200px]">{desc}</div>
-        </div>
+        <span className="text-gray-400">{label}</span>
         <div className="flex items-center gap-2">
           <span
             className="text-[10px] px-1.5 py-0.5 rounded-full"

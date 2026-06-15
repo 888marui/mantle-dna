@@ -6,13 +6,11 @@ import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/anal
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { WalletButton } from "@/components/WalletButton";
+import { LangToggle } from "@/components/LangToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 import Link from "next/link";
 
-const LOADING_STAGES = [
-  "Fetching on-chain data...",
-  "Computing DNA traits...",
-  "Running AI analysis...",
-];
 
 const ARCHETYPE_RARITY: Record<number, string> = {
   0: "12% of wallets", 1: "18% of wallets", 2: "22% of wallets",
@@ -22,12 +20,16 @@ const ARCHETYPE_RARITY: Record<number, string> = {
 export default function WalletPage({ params }: { params: { address: string } }) {
   const { address } = params;
   const searchParams = useSearchParams();
+  const { lang } = useLanguage();
   const network: NetworkType = searchParams.get('network') === 'mainnet' ? 'mainnet' : 'sepolia';
   const [analysis, setAnalysis] = useState<WalletAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
+
+  const LOADING_STAGES = [t(lang, "loading_1"), t(lang, "loading_2"), t(lang, "loading_3")];
 
   const rpcUrl = network === 'mainnet'
     ? (process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz")
@@ -73,6 +75,35 @@ export default function WalletPage({ params }: { params: { address: string } }) 
       });
   }, [address, network]);
 
+  const handleDownloadCert = async () => {
+    if (!analysis) return;
+    setIsDownloading(true);
+    try {
+      const params = new URLSearchParams({
+        address,
+        archetype: String(analysis.archetype),
+        defi: String(analysis.deFiScore),
+        hodl: String(analysis.holdScore),
+        diversity: String(analysis.diversityScore),
+        activity: String(analysis.activityScore),
+        network: analysis.network,
+        mantleScore: String(analysis.mantleScore),
+      });
+      const res = await fetch(`/api/og?${params}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(`/api/og?address=${address}`, "_blank");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
@@ -99,7 +130,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
             </div>
           </div>
 
-          {/* Right: live block + wallet button */}
+          {/* Right: live block + lang toggle + wallet button */}
           <div className="flex items-center gap-3">
             {blockNumber && (
               <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
@@ -107,6 +138,7 @@ export default function WalletPage({ params }: { params: { address: string } }) 
                 #{blockNumber.toLocaleString()}
               </div>
             )}
+            <LangToggle />
             <WalletButton />
           </div>
         </div>
@@ -215,23 +247,13 @@ export default function WalletPage({ params }: { params: { address: string } }) 
                   >
                     ⬡ Farcaster
                   </a>
-                  <a
-                    href={`/api/og?${new URLSearchParams({
-                      address,
-                      archetype: String(analysis.archetype),
-                      defi: String(analysis.deFiScore),
-                      hodl: String(analysis.holdScore),
-                      diversity: String(analysis.diversityScore),
-                      activity: String(analysis.activityScore),
-                      network: analysis.network,
-                      mantleScore: String(analysis.mantleScore),
-                      download: "1",
-                    }).toString()}`}
-                    download={`mantle-dna-${analysis.archetypeName.toLowerCase().replace(/\s/g, "-")}-${address.slice(0, 8)}.png`}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"
+                  <button
+                    onClick={handleDownloadCert}
+                    disabled={isDownloading}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors disabled:opacity-50"
                   >
-                    ↓ Certificate
-                  </a>
+                    {isDownloading ? t(lang, "downloading") : t(lang, "download_cert")}
+                  </button>
                   <a
                     href={`/compare?a=${address}`}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-sm font-medium border border-gray-700 transition-colors"

@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       network = 'sepolia',
       tokenBalances = {},
       mantleScore = 0,
+      language = 'en',
     } = body;
 
     if (!address) {
@@ -60,7 +61,9 @@ Archetype context:
 - "Whale": Large positions; market-moving potential; strategic moves on Init Capital and Lendle
 - "Trader": Active DEX user on Merchant Moe; sharp timing; reads charts; executes with precision
 
-Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values and real token holdings (if present) in your analysis. Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
+Write a DNA profile for this ${archetype}. The tone is insightful and a bit cheeky — like a snarky but brilliant Web3 researcher who just decoded their on-chain soul. Reference actual score values and real token holdings (if present) in your analysis.${language === 'ja' ? ' Respond entirely in Japanese (日本語で回答してください).' : ''}
+
+Return ONLY valid JSON (no markdown, no code blocks) with exactly these fields:
 {
   "insight": "2 punchy sentences that capture their Web3 personality based on their specific scores. Reference actual numbers. Be insightful and a bit cheeky.",
   "strengths": ["3 specific on-chain skills this wallet excels at based on their score pattern — e.g. 'Liquidity timing', 'Protocol risk assessment', 'MNT accumulation discipline'"],

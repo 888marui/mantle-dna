@@ -7,6 +7,9 @@ import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/anal
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { SearchBar } from "@/components/SearchBar";
+import { LangToggle } from "@/components/LangToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 const FEATURED_WALLETS: Array<{ address: string; archetype: string; emoji: string; label: string; network: NetworkType }> = [
   {
@@ -53,22 +56,16 @@ const FEATURED_WALLETS: Array<{ address: string; archetype: string; emoji: strin
   },
 ];
 
-const STATS = [
-  { label: "Archetypes", value: "7 Types" },
-  { label: "Tokens Tracked", value: "4 Live" },
-  { label: "Analysis", value: "AI-Powered" },
-  { label: "Identity", value: "Soulbound" },
+const ARCHETYPES_GALLERY_DATA = [
+  { emoji: "🔥", color: "#f97316", rarity: "12%", nameKey: "arch_defi" as const, descKey: "arch_defi_desc" as const },
+  { emoji: "💎", color: "#06b6d4", rarity: "18%", nameKey: "arch_diamond" as const, descKey: "arch_diamond_desc" as const },
+  { emoji: "🎨", color: "#a855f7", rarity: "22%", nameKey: "arch_nft" as const, descKey: "arch_nft_desc" as const },
+  { emoji: "🌾", color: "#22c55e", rarity: "8%", nameKey: "arch_yield" as const, descKey: "arch_yield_desc" as const },
+  { emoji: "🌱", color: "#10b981", rarity: "25%", nameKey: "arch_newcomer" as const, descKey: "arch_newcomer_desc" as const },
+  { emoji: "🐋", color: "#3b82f6", rarity: "3%", nameKey: "arch_whale" as const, descKey: "arch_whale_desc" as const },
+  { emoji: "📊", color: "#eab308", rarity: "12%", nameKey: "arch_trader" as const, descKey: "arch_trader_desc" as const },
 ];
 
-const ARCHETYPES_GALLERY = [
-  { name: "DeFi Degen", emoji: "🔥", color: "#f97316", rarity: "12%", desc: "High-frequency swaps, yield chasing, protocol hopping." },
-  { name: "Diamond Hands", emoji: "💎", color: "#06b6d4", rarity: "18%", desc: "Patient accumulation, low churn, long-term conviction." },
-  { name: "NFT Collector", emoji: "🎨", color: "#a855f7", rarity: "22%", desc: "Digital art, collectibles, and cultural curation." },
-  { name: "Yield Farmer", emoji: "🌾", color: "#22c55e", rarity: "8%", desc: "Liquidity provision, compounding rewards, APY hunting." },
-  { name: "Newcomer", emoji: "🌱", color: "#10b981", rarity: "25%", desc: "Fresh wallet, early explorer of the Mantle ecosystem." },
-  { name: "Whale", emoji: "🐋", color: "#3b82f6", rarity: "3%", desc: "High-value positions, strategic moves, market impact." },
-  { name: "Trader", emoji: "📊", color: "#eab308", rarity: "12%", desc: "Precision DEX execution, momentum reading, sharp timing." },
-];
 
 const RECENT_KEY = "mantle_dna_recent";
 
@@ -105,6 +102,7 @@ function saveRecent(analysis: WalletAnalysis) {
 
 export default function Home() {
   const { address, isConnected } = useAccount();
+  const { lang } = useLanguage();
   const [analysis, setAnalysis] = useState<WalletAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,9 +112,9 @@ export default function Home() {
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
 
   const LOADING_STAGES = [
-    "Fetching on-chain data...",
-    "Computing DNA traits...",
-    "Running AI analysis...",
+    t(lang, "loading_1"),
+    t(lang, "loading_2"),
+    t(lang, "loading_3"),
   ];
 
   useEffect(() => {
@@ -196,17 +194,18 @@ export default function Home() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {blockNumber && (
               <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Block #{blockNumber.toLocaleString()}
+                #{blockNumber.toLocaleString()}
               </div>
             )}
             <nav className="hidden sm:flex items-center gap-3 text-sm text-gray-500">
-              <a href="/compare" className="hover:text-emerald-400 transition-colors">Compare</a>
-              <a href="/about" className="hover:text-emerald-400 transition-colors">About</a>
+              <a href="/compare" className="hover:text-emerald-400 transition-colors">{t(lang, "nav_compare")}</a>
+              <a href="/about" className="hover:text-emerald-400 transition-colors">{t(lang, "nav_about")}</a>
             </nav>
+            <LangToggle />
           </div>
           <WalletButton />
         </div>
@@ -224,19 +223,24 @@ export default function Home() {
             }}
           />
           <h1 className="relative text-4xl md:text-5xl font-bold text-white leading-tight">
-            Discover Your{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
-              On-Chain DNA
-            </span>
+            {lang === "ja" ? (
+              <>オンチェーン<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">DNA</span>を発見しよう</>
+            ) : (
+              <>Discover Your{" "}<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">On-Chain DNA</span></>
+            )}
           </h1>
-          <p className="relative text-gray-400 text-lg max-w-xl mx-auto">
-            Enter any Mantle wallet address to reveal its on-chain personality — live token balances,
-            AI-generated profile, Mantle Ecosystem Score, and a DNA Evolution Path. Mint it as a Soulbound NFT.
+          <p className="relative text-gray-400 max-w-xl mx-auto">
+            {t(lang, "hero_subtitle")}
           </p>
 
           {/* Stats Bar — pulse on mount */}
           <div className="relative flex flex-wrap justify-center gap-6 pt-2">
-            {STATS.map((stat, i) => (
+            {([
+              { value: t(lang, "stat_archetypes_val"), label: t(lang, "stat_archetypes") },
+              { value: t(lang, "stat_tokens_val"), label: t(lang, "stat_tokens") },
+              { value: t(lang, "stat_analysis_val"), label: t(lang, "stat_analysis") },
+              { value: t(lang, "stat_identity_val"), label: t(lang, "stat_identity") },
+            ]).map((stat, i) => (
               <div
                 key={stat.label}
                 className="text-center"
@@ -262,7 +266,7 @@ export default function Home() {
                 onClick={handleAnalyzeSelf}
                 className="text-sm text-emerald-400 hover:text-emerald-300 underline underline-offset-4 transition-colors"
               >
-                Analyze my wallet ({address?.slice(0, 6)}...{address?.slice(-4)})
+                {t(lang, "search_my_wallet")} ({address?.slice(0, 6)}...{address?.slice(-4)})
               </button>
             </div>
           )}
@@ -314,21 +318,21 @@ export default function Home() {
                 href={`/wallet/${analysis.address}?network=${analysis.network}`}
                 className="text-sm text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors"
               >
-                🔗 Shareable link
+                {t(lang, "shareable_link")}
               </a>
               <span className="text-gray-700">•</span>
               <a
                 href={`/compare?a=${analysis.address}`}
                 className="text-sm text-gray-500 hover:text-gray-400 underline underline-offset-4 transition-colors"
               >
-                Compare wallets
+                {t(lang, "compare_wallets")}
               </a>
               <span className="text-gray-700">•</span>
               <button
                 onClick={() => { setAnalysis(null); setError(null); }}
                 className="text-sm text-gray-500 hover:text-gray-400 underline underline-offset-4 transition-colors"
               >
-                Try another wallet
+                {t(lang, "analyze_another")}
               </button>
             </div>
           </div>
@@ -338,39 +342,24 @@ export default function Home() {
         {!analysis && !loading && (
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-gray-400 text-center uppercase tracking-wider">
-              How It Works
+              {t(lang, "how_works")}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                {
-                  step: "01",
-                  icon: "🔍",
-                  title: "Paste Your Address",
-                  desc: "Enter any wallet address. We fetch live on-chain data from Mantle — balance, transactions, USDT/USDC/mETH/WMNT token holdings. Works on Mainnet and Sepolia.",
-                },
-                {
-                  step: "02",
-                  icon: "🧬",
-                  title: "AI Personality Analysis",
-                  desc: "Claude Haiku analyzes your DeFi score, HODL behavior, protocol diversity, and activity patterns. References real token balances and Mantle Ecosystem Score.",
-                },
-                {
-                  step: "03",
-                  icon: "🎭",
-                  title: "Share, Compare & Mint",
-                  desc: "Mint your archetype as a Soulbound NFT. Share to 𝕏/Farcaster with a DNA Certificate. Compare with another wallet for a compatibility score.",
-                },
+                { step: "01", icon: "🔍", titleKey: "step1_title" as const, descKey: "step1_desc" as const },
+                { step: "02", icon: "🧬", titleKey: "step2_title" as const, descKey: "step2_desc" as const },
+                { step: "03", icon: "🎭", titleKey: "step3_title" as const, descKey: "step3_desc" as const },
               ].map((item) => (
                 <div
                   key={item.step}
-                  className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 space-y-3"
+                  className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 space-y-2"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-bold text-emerald-600 font-mono">{item.step}</span>
                     <span className="text-2xl">{item.icon}</span>
                   </div>
-                  <div className="text-sm font-semibold text-white">{item.title}</div>
-                  <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                  <div className="text-sm font-semibold text-white">{t(lang, item.titleKey)}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{t(lang, item.descKey)}</p>
                 </div>
               ))}
             </div>
@@ -382,14 +371,14 @@ export default function Home() {
           <div className="space-y-4">
             <div className="text-center space-y-1">
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                DNA Archetypes
+                {t(lang, "gallery_title")}
               </h2>
-              <p className="text-xs text-gray-600">Which one are you?</p>
+              <p className="text-xs text-gray-600">{t(lang, "gallery_subtitle")}</p>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-              {ARCHETYPES_GALLERY.map((a) => (
+              {ARCHETYPES_GALLERY_DATA.map((a) => (
                 <div
-                  key={a.name}
+                  key={a.nameKey}
                   className="group relative p-3 rounded-xl flex flex-col items-center gap-2 text-center cursor-default"
                   style={{
                     background: `${a.color}08`,
@@ -401,7 +390,7 @@ export default function Home() {
                     className="text-xs font-semibold leading-tight"
                     style={{ color: a.color }}
                   >
-                    {a.name}
+                    {t(lang, a.nameKey)}
                   </div>
                   <div
                     className="text-[10px] px-1.5 py-0.5 rounded-full"
@@ -411,7 +400,7 @@ export default function Home() {
                   </div>
                   {/* Tooltip on hover */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 p-2 rounded-lg bg-gray-900 border border-gray-700 text-[10px] text-gray-400 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
-                    {a.desc}
+                    {t(lang, a.descKey)}
                   </div>
                 </div>
               ))}
@@ -422,7 +411,7 @@ export default function Home() {
         {/* Featured Wallets */}
         {!analysis && !loading && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white text-center">Featured Wallets</h2>
+            <h2 className="text-lg font-semibold text-white text-center">{t(lang, "featured_wallets")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {FEATURED_WALLETS.map((fw) => (
                 <button
@@ -443,7 +432,7 @@ export default function Home() {
                     {fw.address.slice(0, 16)}...{fw.address.slice(-8)}
                   </div>
                   <div className="text-xs text-emerald-600 group-hover:text-emerald-400 transition-colors">
-                    Click to analyze →
+                    {t(lang, "click_analyze")}
                   </div>
                 </button>
               ))}
@@ -455,7 +444,7 @@ export default function Home() {
         {!analysis && !loading && recentAnalyses.length > 0 && (
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-gray-400 text-center uppercase tracking-wider">
-              Recent
+              {t(lang, "recent")}
             </h2>
             <div className="flex flex-wrap justify-center gap-3">
               {recentAnalyses.map((r) => (
