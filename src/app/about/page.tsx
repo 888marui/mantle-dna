@@ -112,6 +112,31 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Public REST API</h2>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Mantle DNA exposes a public JSON API for on-chain wallet analysis — no auth required.
+            Returns DNA scores, archetype, Mantle Ecosystem Score, and live token balances.
+          </p>
+          <div className="p-3 rounded-lg bg-gray-900/60 border border-gray-800 font-mono text-xs space-y-2">
+            <div className="text-emerald-400">GET /api/wallet/{"{address}"}?network=mainnet</div>
+            <div className="text-gray-500 text-[11px] leading-relaxed">{`{
+  "address": "0x...",
+  "network": "mainnet",
+  "mntBalance": "12.3400",
+  "txCount": 42,
+  "tokenBalances": { "mETH": "1.50", "WMNT": "5.00" },
+  "archetype": 3,
+  "archetypeName": "Yield Farmer",
+  "scores": { "deFiScore": 720, "holdScore": 580, "diversityScore": 810, "activityScore": 340 },
+  "mantleScore": 65,
+  "dnaStrength": 61,
+  "explorerUrl": "https://explorer.mantle.xyz/address/0x...",
+  "analyzedAt": "2026-06-15T08:30:00.000Z"
+}`}</div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Mantle Ecosystem Integration</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
             Each archetype maps to a curated set of Mantle protocols based on behavioral affinity.
