@@ -14,7 +14,8 @@ export function ShareButton({ analysis }: Props) {
     ? window.location.origin
     : "https://mantle-dna.xyz";
 
-  const walletUrl = `${appUrl}/wallet/${analysis.address}`;
+  const networkParam = analysis.network === 'mainnet' ? '?network=mainnet' : '';
+  const walletUrl = `${appUrl}/wallet/${analysis.address}${networkParam}`;
 
   const tweetText = `🧬 My Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\n${walletUrl}\n#MantleDNA #Mantle #Web3`;
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;

@@ -3,7 +3,7 @@
 import { useAccount } from "wagmi";
 import { WalletButton } from "@/components/WalletButton";
 import { useState, useEffect } from "react";
-import { analyzeWallet, type WalletAnalysis } from "@/lib/analyzer";
+import { analyzeWallet, type WalletAnalysis, type NetworkType } from "@/lib/analyzer";
 import { DNACard } from "@/components/DNACard";
 import { DNAVisualizer } from "@/components/DNAVisualizer";
 import { SearchBar } from "@/components/SearchBar";
@@ -110,12 +110,12 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  const handleAnalyze = async (walletAddress: string) => {
+  const handleAnalyze = async (walletAddress: string, network: NetworkType = 'sepolia') => {
     setLoading(true);
     setError(null);
     setAnalysis(null);
     try {
-      const result = await analyzeWallet(walletAddress);
+      const result = await analyzeWallet(walletAddress, network);
       setAnalysis(result);
       saveRecent(result);
       setRecentAnalyses(loadRecent());
@@ -127,7 +127,7 @@ export default function Home() {
   };
 
   const handleAnalyzeSelf = () => {
-    if (address) handleAnalyze(address);
+    if (address) handleAnalyze(address, 'sepolia');
   };
 
   return (
@@ -250,14 +250,21 @@ export default function Home() {
               <DNACard analysis={analysis} onMintDNA={() => {}} />
               <DNAVisualizer analysis={analysis} />
             </div>
-            {/* Shareable link */}
-            <div className="flex justify-center">
+            {/* Actions row */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <a
                 href={`/wallet/${analysis.address}`}
                 className="text-sm text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors"
               >
-                🔗 Share this DNA result: /wallet/{analysis.address.slice(0, 10)}...
+                🔗 Shareable link
               </a>
+              <span className="text-gray-700">•</span>
+              <button
+                onClick={() => { setAnalysis(null); setError(null); }}
+                className="text-sm text-gray-500 hover:text-gray-400 underline underline-offset-4 transition-colors"
+              >
+                Try another wallet
+              </button>
             </div>
           </div>
         )}
@@ -424,6 +431,14 @@ export default function Home() {
               className="hover:text-emerald-500 transition-colors"
             >
               DoraHacks ↗
+            </a>
+            <a
+              href="https://github.com/888marui/mantle-dna"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              GitHub ↗
             </a>
           </div>
         </div>

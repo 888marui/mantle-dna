@@ -1,5 +1,7 @@
 import { createPublicClient, http } from "viem";
-import { mantleTestnet } from "./chains";
+import { mantleMainnet, mantleTestnet } from "./chains";
+
+export type NetworkType = 'mainnet' | 'sepolia';
 
 export interface WalletTraits {
   archetype: number;
@@ -19,6 +21,7 @@ export interface WalletAnalysis extends WalletTraits {
   description: string;
   mntBalance: string;
   address: string;
+  network: NetworkType;
   aiInsight?: string;
   aiStrengths?: string[];
   aiWatchOut?: string;
@@ -98,12 +101,23 @@ function computeProtocolAffinity(
   return protocols;
 }
 
-const MANTLE_RPC = process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz";
+export function getExplorerUrl(address: string, network: NetworkType = 'sepolia'): string {
+  const base = network === 'mainnet'
+    ? 'https://explorer.mantle.xyz'
+    : 'https://explorer.sepolia.mantle.xyz';
+  return `${base}/address/${address}`;
+}
 
-export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
+export async function analyzeWallet(address: string, network: NetworkType = 'sepolia'): Promise<WalletAnalysis> {
+  const rpcUrl = network === 'mainnet'
+    ? (process.env.NEXT_PUBLIC_MANTLE_MAINNET_RPC || "https://rpc.mantle.xyz")
+    : (process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz");
+
+  const chain = network === 'mainnet' ? mantleMainnet : mantleTestnet;
+
   const client = createPublicClient({
-    chain: mantleTestnet,
-    transport: http(MANTLE_RPC),
+    chain,
+    transport: http(rpcUrl),
   });
 
   const addr = address as `0x${string}`;
@@ -139,6 +153,7 @@ export async function analyzeWallet(address: string): Promise<WalletAnalysis> {
     description: archetype.description,
     mntBalance,
     address,
+    network,
     protocolAffinity: computeProtocolAffinity(traits.archetype, traits.deFiScore, traits.holdScore, traits.diversityScore),
   };
 
@@ -200,11 +215,15 @@ function computeTraitsFromAddress(
   const diversityScore = seed(3) % 1000;
   const balanceEth = Number(balance) / 1e18;
 
-  // Use real on-chain tx count if available; fall back to deterministic estimate
-  const txCount = realTxCount ?? Math.floor(seed(5) / 10);
+  // Use real on-chain tx count if meaningful (>0), else use deterministic estimate.
+  // On Mantle Sepolia testnet, most addresses have 0 real txns, which would make
+  // everyone a "Newcomer" — the estimate preserves archetype diversity for demos.
+  const txCount = (realTxCount != null && realTxCount > 0)
+    ? realTxCount
+    : Math.floor(seed(5) / 10);
 
-  // Activity score: boost for wallets with real tx history
-  const activityScore = realTxCount != null
+  // Activity score: boost proportionally when real tx history exists
+  const activityScore = (realTxCount != null && realTxCount > 0)
     ? Math.min(1000, Math.floor((realTxCount / 500) * 1000) + (seed(4) % 200))
     : seed(4) % 1000;
 
