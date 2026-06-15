@@ -368,7 +368,26 @@ export function DNACard({ analysis }: Props) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-400 font-medium uppercase tracking-wider">Mantle Ecosystem Score</span>
-          <span className="font-bold text-sm" style={{ color: accentColor }}>{analysis.mantleScore}/100</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+              style={{
+                background: analysis.mantleScore >= 80 ? "rgba(168,85,247,0.15)" :
+                            analysis.mantleScore >= 60 ? "rgba(234,179,8,0.15)" :
+                            analysis.mantleScore >= 30 ? "rgba(156,163,175,0.15)" : "rgba(120,113,108,0.15)",
+                color: analysis.mantleScore >= 80 ? "#c084fc" :
+                       analysis.mantleScore >= 60 ? "#facc15" :
+                       analysis.mantleScore >= 30 ? "#9ca3af" : "#78716c",
+                border: `1px solid ${analysis.mantleScore >= 80 ? "rgba(168,85,247,0.3)" :
+                                     analysis.mantleScore >= 60 ? "rgba(234,179,8,0.3)" :
+                                     analysis.mantleScore >= 30 ? "rgba(156,163,175,0.3)" : "rgba(120,113,108,0.3)"}`,
+              }}
+            >
+              {analysis.mantleScore >= 80 ? "💜 Platinum" :
+               analysis.mantleScore >= 60 ? "🏆 Gold" :
+               analysis.mantleScore >= 30 ? "🥈 Silver" : "🥉 Bronze"}
+            </span>
+            <span className="font-bold text-sm" style={{ color: accentColor }}>{analysis.mantleScore}/100</span>
+          </div>
         </div>
         <div className="h-1 rounded-full bg-gray-800 overflow-hidden">
           <div
