@@ -1,7 +1,9 @@
 "use client";
 
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
-import { mantleTestnet } from "@/lib/chains";
+import { mantleMainnet, mantleTestnet } from "@/lib/chains";
+
+const MANTLE_CHAIN_IDS = new Set([mantleMainnet.id, mantleTestnet.id]);
 
 export function WalletButton() {
   const { address, isConnected, chainId } = useAccount();
@@ -9,7 +11,7 @@ export function WalletButton() {
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
 
-  const isWrongChain = isConnected && chainId !== mantleTestnet.id;
+  const isWrongChain = isConnected && chainId !== undefined && !MANTLE_CHAIN_IDS.has(chainId as 5000 | 5003);
 
   if (!isConnected) {
     return (
@@ -26,7 +28,7 @@ export function WalletButton() {
   if (isWrongChain) {
     return (
       <button
-        onClick={() => switchChain({ chainId: mantleTestnet.id })}
+        onClick={() => switchChain({ chainId: mantleMainnet.id })}
         className="px-4 py-2 rounded-lg bg-yellow-700 hover:bg-yellow-600 text-white text-sm font-medium transition-colors"
       >
         Switch to Mantle
