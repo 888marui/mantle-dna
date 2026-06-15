@@ -396,6 +396,12 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <a
+              href="/about"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              About
+            </a>
+            <a
               href="https://mantle.xyz"
               target="_blank"
               rel="noopener noreferrer"
