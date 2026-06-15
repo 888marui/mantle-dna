@@ -25,9 +25,9 @@ export default function AboutPage() {
         <div className="space-y-3">
           <h1 className="text-3xl font-bold text-white">About Mantle DNA</h1>
           <p className="text-gray-400 leading-relaxed">
-            Mantle DNA is an AI-powered wallet personality profiler built for the Mantle Network.
+            Mantle DNA is an AI-powered wallet personality profiler built for Mantle Network.
             It analyzes on-chain behavior to generate a unique &quot;DNA archetype&quot; for any wallet,
-            minted as a soulbound NFT on Mantle Sepolia.
+            rendered as a visual genome and optionally minted as a Soulbound NFT on Mantle.
           </p>
         </div>
 
@@ -35,14 +35,14 @@ export default function AboutPage() {
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Tech Stack</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { name: "Next.js 14", role: "App Router, API routes, Edge runtime", icon: "⚡" },
-              { name: "Mantle RPC", role: "Real-time balance + transaction count", icon: "🔗" },
-              { name: "Claude Haiku", role: "AI wallet personality analysis", icon: "🤖" },
-              { name: "viem + wagmi", role: "Type-safe Ethereum interactions", icon: "🔧" },
-              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG card generation", icon: "🖼️" },
-              { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity", icon: "🎭" },
-              { name: "Hardhat + Solidity", role: "Smart contract development", icon: "⛓️" },
-              { name: "Tailwind CSS", role: "Utility-first styling", icon: "🎨" },
+              { name: "Next.js 14", role: "App Router, API routes, Edge runtime OG images", icon: "⚡" },
+              { name: "Mantle RPC (dual-network)", role: "Real-time balance + tx count on Mainnet & Sepolia", icon: "🔗" },
+              { name: "Claude Haiku", role: "AI wallet personality analysis via Anthropic SDK", icon: "🤖" },
+              { name: "viem + wagmi v2", role: "Type-safe Ethereum interactions + wallet connect", icon: "🔧" },
+              { name: "next/og (ImageResponse)", role: "Dynamic 1200×630 OG cards (wallet + landing)", icon: "🖼️" },
+              { name: "ERC-721 Soulbound NFT", role: "Non-transferable on-chain identity with AI hash", icon: "🎭" },
+              { name: "Hardhat + Solidity 0.8.20", role: "Smart contract with full test coverage", icon: "⛓️" },
+              { name: "Tailwind CSS + SVG", role: "Animated DNA helix, radar chart, archetype art", icon: "🎨" },
             ].map((item) => (
               <div key={item.name} className="p-4 rounded-xl bg-gray-900/60 border border-gray-800 flex gap-3">
                 <span className="text-xl">{item.icon}</span>
@@ -60,24 +60,24 @@ export default function AboutPage() {
           <div className="space-y-3">
             {[
               {
-                step: "1. On-Chain Analysis",
-                desc: "When you submit a wallet address, we fetch the real MNT balance and transaction count from Mantle Sepolia via RPC. These feed into a deterministic trait computation engine that calculates DeFi, HODLing, Diversity, and Activity scores (0-1000 each).",
+                step: "1. Dual-Network On-Chain Analysis",
+                desc: "Submit a wallet address with Mantle Mainnet or Sepolia network selection. We fetch the real MNT balance and transaction nonce via RPC (with a 10s timeout). These feed into a trait computation engine calculating DeFi Engagement, HODLing, Protocol Diversity, and On-chain Activity scores (0–1000 each).",
               },
               {
-                step: "2. Archetype Classification",
-                desc: "A rule-based classifier maps trait scores to one of 7 archetypes: DeFi Degen, Diamond Hands, NFT Collector, Yield Farmer, Newcomer, Whale, or Trader. Archetype selection is deterministic — the same address always gets the same archetype.",
+                step: "2. Rule-Based Archetype Classification",
+                desc: "A deterministic classifier maps trait scores to one of 7 archetypes: DeFi Degen (deFiScore > 800), Diamond Hands (holdScore > 800), Yield Farmer (diversity > 700 + defi > 500), Trader (activityScore > 750), Whale (balance > 100 MNT), Newcomer (txCount < 5), or NFT Collector (balanced profile). The classification reason is displayed transparently on the card.",
               },
               {
                 step: "3. AI Personality Profile",
-                desc: "Claude Haiku (claude-haiku-4-5-20251001) generates a unique narrative insight, 3 on-chain strengths, a risk watch-out, and a Mantle ecosystem prediction — all grounded in the wallet's actual trait scores. A deterministic fallback ensures insights always display even without an API key.",
+                desc: "Claude Haiku (claude-haiku-4-5-20251001) generates a unique insight, 3 on-chain strengths, a risk watch-out, and a Mantle ecosystem prediction — grounded in the wallet's actual trait scores and network context. A deterministic fallback ensures insights always display even without an API key.",
               },
               {
-                step: "4. Visual DNA + Sharing",
-                desc: "The wallet's genome is rendered as an animated double helix, a 4-axis radar chart, and a unique ATCG base sequence. Users get a shareable /wallet/[address] URL with a dynamically generated 1200×630 OG image for rich Twitter previews.",
+                step: "4. Visual DNA + Social Sharing",
+                desc: "The wallet genome is rendered as an animated double helix, a 4-axis radar chart (DeFi/Activity/HODLing/Diversity), and a unique ATCG base sequence derived from the address hex. Each wallet gets a shareable /wallet/[address] URL with a dynamically generated 1200×630 OG image for rich Twitter preview cards. The main landing page also has its own OG image showing all 7 archetypes.",
               },
               {
                 step: "5. Soulbound NFT Mint",
-                desc: "The DNA traits (archetype, scores, analyzed-at timestamp, and a keccak256 hash of the AI insight) are encoded into an ERC-721 Soulbound NFT on Mantle Sepolia. Transfers are blocked at the contract level, making it a permanent on-chain identity token.",
+                desc: "The DNA traits (archetype, scores, analyzed-at timestamp, and a keccak256 hash of the AI insight text) are encoded into an ERC-721 Soulbound NFT on Mantle. Transfers are blocked at the contract level. Wallets can self-mint their own DNA, or an authorized oracle can mint on behalf of wallets. The frontend checks the on-chain mint status in real-time and shows the token ID if already minted.",
               },
             ].map((item) => (
               <div key={item.step} className="p-4 rounded-xl bg-gray-900/40 border border-gray-800 space-y-1">
@@ -89,11 +89,35 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">7 DNA Archetypes</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            {[
+              { emoji: "🔥", name: "DeFi Degen", rule: "deFiScore > 800", color: "#f97316" },
+              { emoji: "💎", name: "Diamond Hands", rule: "holdScore > 800", color: "#06b6d4" },
+              { emoji: "🎨", name: "NFT Collector", rule: "Balanced profile", color: "#a855f7" },
+              { emoji: "🌾", name: "Yield Farmer", rule: "diversity > 700 + defi > 500", color: "#22c55e" },
+              { emoji: "🌱", name: "Newcomer", rule: "txCount < 5", color: "#10b981" },
+              { emoji: "🐋", name: "Whale", rule: "balance > 100 MNT", color: "#3b82f6" },
+              { emoji: "📊", name: "Trader", rule: "activityScore > 750", color: "#eab308" },
+            ].map((a) => (
+              <div key={a.name} className="px-3 py-2.5 rounded-lg bg-gray-900 border border-gray-800 flex items-center gap-2">
+                <span className="text-base">{a.emoji}</span>
+                <div>
+                  <div className="font-semibold" style={{ color: a.color }}>{a.name}</div>
+                  <div className="text-gray-600 text-[10px] font-mono">{a.rule}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white border-b border-gray-800 pb-2">Mantle Ecosystem Integration</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Each archetype maps to a curated set of Mantle protocols based on behavioral affinity:
+            Each archetype maps to a curated set of Mantle protocols based on behavioral affinity.
+            Protocol badges on the DNA card link directly to each protocol.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             {[
               "Agni Finance", "Merchant Moe", "Init Capital",
               "mETH Protocol", "Lendle", "FBTC",
@@ -106,12 +130,14 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-1">
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-900/50 space-y-2">
           <div className="text-sm font-semibold text-emerald-400">Built for Mantle Turing Test Hackathon 2026</div>
-          <p className="text-xs text-gray-500">
-            Demonstrates Technical Depth (AI + on-chain), Innovation (DNA metaphor, OG sharing),
-            Mantle Ecosystem (7 protocol integrations), and Product Completeness (end-to-end flow).
-          </p>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
+            <div>⚡ Technical Depth — AI + RPC + SBT + OG</div>
+            <div>💡 Innovation — DNA metaphor + social sharing</div>
+            <div>🔗 Mantle Ecosystem — 8 protocol integrations</div>
+            <div>✅ Product Complete — end-to-end working flow</div>
+          </div>
         </div>
       </div>
     </main>
