@@ -118,20 +118,20 @@ export function DNAVisualizer({ analysis }: Props) {
         </svg>
       </div>
 
-      {/* Trait Legend */}
+      {/* Radar Chart */}
       <div className="space-y-2">
-        <div className="text-xs text-gray-500 uppercase tracking-wider">Trait Breakdown</div>
-        <div className="grid grid-cols-2 gap-2">
-          {traitLabels(analysis).map((t) => (
-            <div key={t.label} className="flex items-center gap-2 text-xs">
-              <div
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: t.color, boxShadow: `0 0 4px ${t.color}80` }}
-              />
-              <span className="text-gray-400">{t.label}</span>
-              <span className="text-gray-300 ml-auto font-mono">{t.value}</span>
-            </div>
-          ))}
+        <div className="text-xs text-gray-500 uppercase tracking-wider">Trait Radar</div>
+        <RadarChart analysis={analysis} accentColor={accentColor} />
+      </div>
+
+      {/* DNA Sequence Code */}
+      <div className="space-y-1.5">
+        <div className="text-xs text-gray-600 uppercase tracking-wider">Sequence ID</div>
+        <div
+          className="font-mono text-xs leading-relaxed break-all"
+          style={{ color: `${accentColor}80` }}
+        >
+          {generateDNACode(analysis.address)}
         </div>
       </div>
 
@@ -179,12 +179,131 @@ function generateStrands(analysis: WalletAnalysis, colors: string[]): Strand[] {
   return strands;
 }
 
-function traitLabels(analysis: WalletAnalysis) {
-  const colors = TRAIT_COLORS[analysis.archetype] || TRAIT_COLORS[0];
-  return [
-    { label: "DeFi", value: `${(analysis.deFiScore / 10).toFixed(0)}%`, color: colors[0] },
-    { label: "Holding", value: `${(analysis.holdScore / 10).toFixed(0)}%`, color: colors[1] },
-    { label: "Diversity", value: `${(analysis.diversityScore / 10).toFixed(0)}%`, color: colors[2] },
-    { label: "Activity", value: `${(analysis.activityScore / 10).toFixed(0)}%`, color: colors[3] },
+function generateDNACode(address: string): string {
+  const hex = address.toLowerCase().replace("0x", "");
+  const bases = ["A", "T", "C", "G"];
+  let code = "";
+  for (let i = 0; i < 32; i++) {
+    const nibble = parseInt(hex[i % hex.length], 16);
+    code += bases[nibble % 4];
+    if ((i + 1) % 8 === 0 && i < 31) code += " ";
+  }
+  return code;
+}
+
+function RadarChart({ analysis, accentColor }: { analysis: WalletAnalysis; accentColor: string }) {
+  const cx = 110;
+  const cy = 110;
+  const r = 80;
+
+  const scores = [
+    { label: "DeFi", value: analysis.deFiScore / 1000, angle: -90 },
+    { label: "Activity", value: analysis.activityScore / 1000, angle: 0 },
+    { label: "HODLing", value: analysis.holdScore / 1000, angle: 90 },
+    { label: "Diversity", value: analysis.diversityScore / 1000, angle: 180 },
   ];
+
+  const toXY = (angle: number, radius: number) => {
+    const rad = (angle * Math.PI) / 180;
+    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+  };
+
+  const gridLevels = [0.25, 0.5, 0.75, 1];
+
+  const polygonPoints = (level: number) =>
+    scores.map((s) => toXY(s.angle, r * level)).map((p) => `${p.x},${p.y}`).join(" ");
+
+  const dataPoints = scores.map((s) => toXY(s.angle, r * s.value)).map((p) => `${p.x},${p.y}`).join(" ");
+
+  return (
+    <div className="flex justify-center">
+      <svg width="220" height="220" viewBox="0 0 220 220">
+        {/* Grid polygons */}
+        {gridLevels.map((level) => (
+          <polygon
+            key={level}
+            points={polygonPoints(level)}
+            fill="none"
+            stroke={`${accentColor}20`}
+            strokeWidth={1}
+          />
+        ))}
+
+        {/* Axis lines */}
+        {scores.map((s) => {
+          const end = toXY(s.angle, r);
+          return (
+            <line
+              key={s.label}
+              x1={cx}
+              y1={cy}
+              x2={end.x}
+              y2={end.y}
+              stroke={`${accentColor}25`}
+              strokeWidth={1}
+            />
+          );
+        })}
+
+        {/* Data polygon */}
+        <polygon
+          points={dataPoints}
+          fill={`${accentColor}25`}
+          stroke={accentColor}
+          strokeWidth={2}
+          strokeLinejoin="round"
+        />
+
+        {/* Data points */}
+        {scores.map((s) => {
+          const pt = toXY(s.angle, r * s.value);
+          return (
+            <circle
+              key={s.label}
+              cx={pt.x}
+              cy={pt.y}
+              r={4}
+              fill={accentColor}
+              style={{ filter: `drop-shadow(0 0 4px ${accentColor})` }}
+            />
+          );
+        })}
+
+        {/* Axis labels */}
+        {scores.map((s) => {
+          const labelR = r + 18;
+          const pt = toXY(s.angle, labelR);
+          const pct = Math.round(s.value * 100);
+          return (
+            <g key={s.label}>
+              <text
+                x={pt.x}
+                y={pt.y - 4}
+                textAnchor="middle"
+                fontSize="9"
+                fill="#6b7280"
+                fontFamily="system-ui"
+              >
+                {s.label}
+              </text>
+              <text
+                x={pt.x}
+                y={pt.y + 8}
+                textAnchor="middle"
+                fontSize="9"
+                fontWeight="600"
+                fill={accentColor}
+                fontFamily="system-ui"
+              >
+                {pct}%
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Center dot */}
+        <circle cx={cx} cy={cy} r={3} fill={`${accentColor}60`} />
+      </svg>
+    </div>
+  );
 }

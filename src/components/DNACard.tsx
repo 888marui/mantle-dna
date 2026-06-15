@@ -4,9 +4,21 @@ import { type WalletAnalysis } from "@/lib/analyzer";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { WALLET_DNA_ADDRESS, WALLET_DNA_ABI } from "@/lib/contracts";
 
-const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
 import { keccak256, toBytes } from "viem";
 import { ShareButton } from "@/components/ShareButton";
+
+const CONTRACT_DEPLOYED = WALLET_DNA_ADDRESS !== "0x0000000000000000000000000000000000000000";
+
+const PROTOCOL_URLS: Record<string, string> = {
+  "Agni Finance": "https://agni.finance",
+  "Merchant Moe": "https://merchantmoe.com",
+  "Init Capital": "https://init.capital",
+  "mETH Protocol": "https://meth.mantle.xyz",
+  "Lendle": "https://lendle.xyz",
+  "FBTC": "https://fbtc.io",
+  "Mantle NFT Market": "https://mantle.xyz/ecosystem",
+  "Mantle Bridge": "https://bridge.mantle.xyz",
+};
 
 interface Props {
   analysis: WalletAnalysis;
@@ -29,6 +41,16 @@ const ARCHETYPE_COLORS: Record<number, string> = {
   4: "#10b981", // Newcomer — emerald
   5: "#3b82f6", // Whale — blue
   6: "#eab308", // Trader — yellow
+};
+
+const ARCHETYPE_RARITY: Record<number, string> = {
+  0: "12% of wallets",
+  1: "18% of wallets",
+  2: "22% of wallets",
+  3: "8% of wallets",
+  4: "25% of wallets",
+  5: "3% of wallets",
+  6: "12% of wallets",
 };
 
 export function DNACard({ analysis }: Props) {
@@ -134,8 +156,19 @@ export function DNACard({ analysis }: Props) {
             DNA Archetype
           </div>
           <div className="text-2xl font-bold text-white">{analysis.archetypeName}</div>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span
+              className="text-xs px-1.5 py-0.5 rounded-full"
+              style={{ background: `${accentColor}20`, color: accentColor }}
+            >
+              Top {ARCHETYPE_RARITY[analysis.archetype] ?? "rare"}
+            </span>
+          </div>
           <div className="text-xs text-gray-500 font-mono mt-1">
             {analysis.address.slice(0, 10)}...{analysis.address.slice(-8)}
+          </div>
+          <div className="text-xs text-gray-600 mt-0.5">
+            First seen ~block #{analysis.firstSeenBlock.toLocaleString()}
           </div>
         </div>
       </div>
@@ -230,25 +263,41 @@ export function DNACard({ analysis }: Props) {
         <div className="text-xs text-gray-500 uppercase tracking-wider">Mantle Ecosystem Affinity</div>
         <div className="flex flex-wrap gap-2">
           {analysis.protocolAffinity.map((protocol) => (
-            <span
+            <a
               key={protocol}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium"
+              href={PROTOCOL_URLS[protocol] ?? "https://mantle.xyz/ecosystem"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105"
               style={{
                 background: `${accentColor}15`,
                 border: `1px solid ${accentColor}35`,
                 color: "#9ca3af",
               }}
             >
-              {protocol}
-            </span>
+              {protocol} ↗
+            </a>
           ))}
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <StatBadge label="Transactions" value={analysis.txCount.toString()} accentColor={accentColor} />
         <StatBadge label="MNT Balance" value={`${analysis.mntBalance} MNT`} accentColor={accentColor} />
+        <a
+          href={`https://explorer.sepolia.mantle.xyz/address/${analysis.address}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-3 rounded-xl flex flex-col justify-between transition-all hover:opacity-80"
+          style={{
+            background: "rgba(31,41,55,0.6)",
+            border: `1px solid ${accentColor}25`,
+          }}
+        >
+          <div className="text-xs text-gray-500 mb-1">Explorer</div>
+          <div className="text-sm font-semibold" style={{ color: accentColor }}>View ↗</div>
+        </a>
       </div>
 
       {/* Score Bars */}
@@ -267,8 +316,33 @@ export function DNACard({ analysis }: Props) {
           🎉 DNA NFT minted to your wallet!
         </div>
       ) : !CONTRACT_DEPLOYED ? (
-        <div className="p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-gray-500 text-xs text-center">
-          Soulbound NFT minting coming soon — contract deploying to Mantle Sepolia
+        <div
+          className="p-4 rounded-xl space-y-2"
+          style={{ background: `${accentColor}08`, border: `1px solid ${accentColor}25` }}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentColor }}>
+              Soulbound NFT
+            </span>
+            <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">
+              Deploying to Mantle Sepolia
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Your {analysis.archetypeName} DNA will be minted as a non-transferable ERC-721 token —
+            your permanent on-chain identity on Mantle Network.
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            {["Non-transferable", "On-chain traits", "AI hash verified"].map((trait) => (
+              <span
+                key={trait}
+                className="text-xs px-2 py-0.5 rounded-full"
+                style={{ background: `${accentColor}15`, color: `${accentColor}cc` }}
+              >
+                ✓ {trait}
+              </span>
+            ))}
+          </div>
         </div>
       ) : (
         <button

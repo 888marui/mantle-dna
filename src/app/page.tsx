@@ -75,6 +75,7 @@ export default function Home() {
   const [recentAnalyses, setRecentAnalyses] = useState<RecentEntry[]>([]);
   const [statsMounted, setStatsMounted] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
+  const [blockNumber, setBlockNumber] = useState<number | null>(null);
 
   const LOADING_STAGES = [
     "Fetching on-chain data...",
@@ -84,8 +85,15 @@ export default function Home() {
 
   useEffect(() => {
     setRecentAnalyses(loadRecent());
-    // Trigger stats pulse after a brief delay
     const t = setTimeout(() => setStatsMounted(true), 300);
+    fetch(process.env.NEXT_PUBLIC_MANTLE_RPC || "https://rpc.sepolia.mantle.xyz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "eth_blockNumber", params: [], id: 1 }),
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.result) setBlockNumber(parseInt(d.result, 16)); })
+      .catch(() => {});
     return () => clearTimeout(t);
   }, []);
 
@@ -136,6 +144,12 @@ export default function Home() {
               </span>
             </div>
           </div>
+          {blockNumber && (
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 font-mono">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Block #{blockNumber.toLocaleString()}
+            </div>
+          )}
           <WalletButton />
         </div>
       </header>
@@ -230,18 +244,57 @@ export default function Home() {
               <DNACard analysis={analysis} onMintDNA={() => {}} />
               <DNAVisualizer analysis={analysis} />
             </div>
-            {/* Share on X after analysis */}
+            {/* Shareable link */}
             <div className="flex justify-center">
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🧬 Just discovered my Mantle DNA: I'm a ${analysis.archetypeName} ${analysis.archetypeEmoji}\n\nDeFi: ${analysis.deFiScore}/1000 | HODL: ${analysis.holdScore}/1000\n\n${analysis.aiInsight || analysis.description}\n\nDiscover your on-chain DNA 👇\nmantle-dna.xyz\n#MantleDNA #Mantle #Web3`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-semibold border border-gray-700 transition-colors"
+                href={`/wallet/${analysis.address}`}
+                className="text-sm text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors"
               >
-                <span>Share your DNA on 𝕏</span>
+                🔗 Share this DNA result: /wallet/{analysis.address.slice(0, 10)}...
               </a>
+            </div>
+          </div>
+        )}
+
+        {/* How It Works */}
+        {!analysis && !loading && (
+          <div className="space-y-4">
+            <h2 className="text-sm font-semibold text-gray-400 text-center uppercase tracking-wider">
+              How It Works
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                {
+                  step: "01",
+                  icon: "🔍",
+                  title: "Paste Your Address",
+                  desc: "Enter any Mantle wallet address. We fetch your on-chain data live from Mantle Sepolia.",
+                },
+                {
+                  step: "02",
+                  icon: "🧬",
+                  title: "AI Analysis",
+                  desc: "Claude AI analyzes your DeFi activity, transaction patterns, and portfolio behavior to reveal your DNA.",
+                },
+                {
+                  step: "03",
+                  icon: "🎭",
+                  title: "Mint Your Identity",
+                  desc: "Receive one of 7 archetypes and mint it as a soulbound NFT — your permanent on-chain identity on Mantle.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className="p-5 rounded-xl bg-gray-900/60 border border-gray-800 space-y-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-emerald-600 font-mono">{item.step}</span>
+                    <span className="text-2xl">{item.icon}</span>
+                  </div>
+                  <div className="text-sm font-semibold text-white">{item.title}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -325,6 +378,44 @@ export default function Home() {
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800/40 px-6 py-8 mt-8">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
+          <div className="flex items-center gap-2">
+            <span>🧬</span>
+            <span className="font-semibold text-gray-500">Mantle DNA</span>
+            <span>—</span>
+            <span>Built on Mantle Network</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://mantle.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              Mantle ↗
+            </a>
+            <a
+              href="https://explorer.sepolia.mantle.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              Explorer ↗
+            </a>
+            <a
+              href="https://dorahacks.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-500 transition-colors"
+            >
+              DoraHacks ↗
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
